@@ -1596,6 +1596,8 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.add("is-hidden");
       listApp.querySelector(".d-tabs").classList.add("is-hidden");
       listApp.querySelector(".d-progress").style.display = "none";
+      listApp.querySelector(".d-week-nav").style.display = "none";
+      listApp.querySelector(".d-streak").style.display = "none";
       const detail = listApp.querySelector(".d-detail");
       detail.classList.add("is-active");
       detail.querySelector(".d-back").textContent = "‹ 返回新闻列表";
@@ -1624,6 +1626,8 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.remove("is-hidden");
       listApp.querySelector(".d-tabs").classList.remove("is-hidden");
       listApp.querySelector(".d-progress").style.display = "";
+      listApp.querySelector(".d-week-nav").style.display = "grid";
+      listApp.querySelector(".d-streak").style.display = "";
       updateProgress(listApp, currentMode);
     }
     function showKnowledge(index) {
@@ -1633,6 +1637,8 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.add("is-hidden");
       listApp.querySelector(".d-tabs").classList.add("is-hidden");
       listApp.querySelector(".d-progress").style.display = "none";
+      listApp.querySelector(".d-week-nav").style.display = "none";
+      listApp.querySelector(".d-streak").style.display = "none";
       const view = listApp.querySelector(".d-knowledge-full");
       view.classList.add("is-visible");
       view.classList.toggle("d-bridge-view", index === 3);
@@ -1655,6 +1661,8 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.remove("is-hidden");
       listApp.querySelector(".d-tabs").classList.remove("is-hidden");
       listApp.querySelector(".d-progress").style.display = "";
+      listApp.querySelector(".d-week-nav").style.display = "grid";
+      listApp.querySelector(".d-streak").style.display = "";
       updateProgress(listApp, currentMode);
     }
     listApp.querySelectorAll("[data-tab]").forEach(button => button.addEventListener("click", () => {
@@ -1721,6 +1729,7 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.add("is-hidden");
       listApp.querySelector(".d-tabs").classList.add("is-hidden");
       listApp.querySelector(".d-week-nav").style.display = "none";
+      listApp.querySelector(".d-streak").style.display = "none";
       listApp.querySelector(".d-progress").style.display = "none";
       listApp.querySelector(".d-weekly-summary").classList.add("is-visible");
     });
@@ -1730,6 +1739,7 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-top").classList.remove("is-hidden");
       listApp.querySelector(".d-tabs").classList.remove("is-hidden");
       listApp.querySelector(".d-week-nav").style.display = "grid";
+      listApp.querySelector(".d-streak").style.display = "";
       listApp.querySelector(".d-progress").style.display = "";
       currentMode = "knowledge";
       listApp.querySelector('[data-tab="knowledge"]').click();
@@ -2411,6 +2421,21 @@ html>body{padding:0}</style>
       select(0);
     }
   })();
+</script>
+<script>
+(() => {
+  const root = document.getElementById("daily-brief-designs");
+  if (!root) return;
+  root.querySelector(':scope > section[data-variant="逐条翻阅"]')?.remove();
+  root.querySelector(".viz-carousel-controls")?.remove();
+  root.querySelector('[role="status"]')?.remove();
+  root.classList.remove("viz-carousel");
+  root.removeAttribute("role");
+  root.removeAttribute("data-active-variant");
+  const mainView = root.querySelector(':scope > section[data-variant="列表进详情"]');
+  mainView?.removeAttribute("data-variant");
+  mainView?.removeAttribute("role");
+})();
 </script>
 <script id="codex-visualization-lucide" async src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js"></script>
 <script>
