@@ -1591,6 +1591,7 @@ html>body{padding:0}</style>
     }
     function showDetail(index) {
       detailIndex = index;
+      history.pushState({ dailyBriefView: "news" }, "", `${location.pathname}${location.search}#news-${index}`);
       const item = newsItems[index];
       listApp.querySelector(".d-list-view").classList.add("is-hidden");
       listApp.querySelector(".d-top").classList.add("is-hidden");
@@ -1633,6 +1634,7 @@ html>body{padding:0}</style>
     }
     function showKnowledge(index) {
       detailKnowledgeIndex = index;
+      history.pushState({ dailyBriefView: "knowledge" }, "", `${location.pathname}${location.search}#knowledge-${index}`);
       const item = knowledgeItems[index];
       listApp.querySelector(".d-list-view").classList.add("is-hidden");
       listApp.querySelector(".d-top").classList.add("is-hidden");
@@ -1724,9 +1726,19 @@ html>body{padding:0}</style>
     }));
     listApp.querySelectorAll("[data-story]").forEach(button => button.addEventListener("click", () => showDetail(Number(button.dataset.story))));
     listApp.querySelectorAll("[data-knowledge]").forEach(button => button.addEventListener("click", () => showKnowledge(Number(button.dataset.knowledge))));
-    listApp.querySelector(".d-detail .d-back").addEventListener("click", closeDetail);
-    listApp.querySelector(".d-knowledge-full .d-back").addEventListener("click", closeKnowledge);
+    function returnToList(closeView) {
+      if (history.state?.dailyBriefView) history.back();
+      else closeView();
+    }
+    listApp.querySelector(".d-detail .d-back").addEventListener("click", () => returnToList(closeDetail));
+    listApp.querySelector(".d-knowledge-full .d-back").addEventListener("click", () => returnToList(closeKnowledge));
+    window.addEventListener("popstate", () => {
+      if (listApp.querySelector(".d-detail").classList.contains("is-active")) closeDetail();
+      else if (listApp.querySelector(".d-knowledge-full").classList.contains("is-visible")) closeKnowledge();
+      else if (listApp.querySelector(".d-weekly-summary").classList.contains("is-visible")) closeWeeklySummary();
+    });
     listApp.querySelector("[data-open-weekly-summary]").addEventListener("click", () => {
+      history.pushState({ dailyBriefView: "weekly-summary" }, "", `${location.pathname}${location.search}#weekly-summary`);
       listApp.querySelector(".d-list-view").classList.add("is-hidden");
       listApp.querySelector(".d-top").classList.add("is-hidden");
       listApp.querySelector(".d-tabs").classList.add("is-hidden");
@@ -1735,7 +1747,7 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-progress").style.display = "none";
       listApp.querySelector(".d-weekly-summary").classList.add("is-visible");
     });
-    listApp.querySelector("[data-weekly-back]").addEventListener("click", () => {
+    function closeWeeklySummary() {
       listApp.querySelector(".d-weekly-summary").classList.remove("is-visible");
       listApp.querySelector(".d-list-view").classList.remove("is-hidden");
       listApp.querySelector(".d-top").classList.remove("is-hidden");
@@ -1745,7 +1757,8 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-progress").style.display = "";
       currentMode = "knowledge";
       listApp.querySelector('[data-tab="knowledge"]').click();
-    });
+    }
+    listApp.querySelector("[data-weekly-back]").addEventListener("click", () => returnToList(closeWeeklySummary));
     listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[selectedDay].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); listApp.querySelector(`[data-read-label="${detailIndex}"]`).textContent="已读 ✓"; closeDetail(); });
     listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[selectedDay].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); closeKnowledge(); });
     updateProgress(listApp,"news");
