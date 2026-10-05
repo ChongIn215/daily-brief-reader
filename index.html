@@ -1600,6 +1600,7 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-streak").style.display = "none";
       const detail = listApp.querySelector(".d-detail");
       detail.classList.add("is-active");
+      window.scrollTo(0, 0);
       detail.querySelector(".d-back").textContent = "‹ 返回新闻列表";
       detail.querySelector("[data-detail-tag]").textContent = `${item.category} · ${item.length}`;
       detail.querySelector("[data-detail-title]").textContent = item.title;
@@ -1641,6 +1642,7 @@ html>body{padding:0}</style>
       listApp.querySelector(".d-streak").style.display = "none";
       const view = listApp.querySelector(".d-knowledge-full");
       view.classList.add("is-visible");
+      window.scrollTo(0, 0);
       view.classList.toggle("d-bridge-view", index === 3);
       view.querySelector("[data-k-tag]").textContent = item.category;
       view.querySelector("[data-k-title]").textContent = item.title;
