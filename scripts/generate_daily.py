@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import difflib
 import email.utils
 import hashlib
 import html
@@ -284,6 +285,29 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> di
     for item in news:
         ids = item.get("sourceIds", [])
         refs = [allowed[source_id] for source_id in ids if source_id in allowed]
+        # Models occasionally return a paraphrased/incorrect source ID. Recover
+        # only when the generated headline closely matches a real supplied RSS
+        # headline; the published citation remains the real feed URL.
+        if not refs and isinstance(item.get("title"), str):
+            title_key = re.sub(r"[\W_]+", "", item["title"], flags=re.UNICODE).lower()
+            ranked = sorted(
+                sources,
+                key=lambda ref: difflib.SequenceMatcher(
+                    None,
+                    title_key,
+                    re.sub(r"[\W_]+", "", ref["title"], flags=re.UNICODE).lower(),
+                ).ratio(),
+                reverse=True,
+            )
+            if ranked:
+                candidate = ranked[0]
+                similarity = difflib.SequenceMatcher(
+                    None,
+                    title_key,
+                    re.sub(r"[\W_]+", "", candidate["title"], flags=re.UNICODE).lower(),
+                ).ratio()
+                if similarity >= 0.58:
+                    refs = [candidate]
         publishers = {ref["publisher"] for ref in refs}
         if not publishers or (not publishers.issubset({"人民网", "新华网", "中国新闻网"}) and len(publishers) < 2):
             continue
