@@ -1565,7 +1565,8 @@ Total output lines: 180
     const initialDateLabel = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
     document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = initialDateLabel);
     let selectedEdition = null;
-    const editionCache = new Map([[todayDateKey, {date:todayDateKey,...fallbackEdition,_isFallback:true}]]);
+    // Keep the demo fallback out of the date cache so it cannot replace a real daily edition when switching dates.
+    const editionCache = new Map();
     async function fetchEdition(dateKey) {
       try {
         const contentBase = location.protocol === "file:" ? "https://chongin215.github.io/daily-brief-reader/content/" : "./content/";
