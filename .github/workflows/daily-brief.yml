@@ -1,8 +1,11 @@
 name: Generate daily brief
 
 on:
+  push:
+    paths:
+      - "automation/backfill-date.txt"
   schedule:
-    - cron: "0 0 * * *" # 08:00 China Standard Time
+    - cron: "30 23 * * *" # 07:30 China Standard Time
   workflow_dispatch:
     inputs:
       brief_date:
@@ -35,14 +38,36 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TZ: Asia/Shanghai
           BRIEF_DATE: ${{ inputs.brief_date }}
-        run: python scripts/generate_daily.py
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            if [[ ! -f automation/backfill-date.txt ]]; then
+              echo "No pending backfill request; skipping."
+              exit 0
+            fi
+            BRIEF_DATE="$(tr -d '[:space:]' < automation/backfill-date.txt)"
+          fi
+          if [[ -n "$BRIEF_DATE" ]]; then
+            if [[ ! "$BRIEF_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              echo "BRIEF_DATE must use YYYY-MM-DD format."
+              exit 1
+            fi
+            echo "BRIEF_DATE=$BRIEF_DATE" >> "$GITHUB_ENV"
+          fi
+          python scripts/generate_daily.py
 
       - name: Publish the dated edition
         env:
           TZ: Asia/Shanghai
-          BRIEF_DATE: ${{ inputs.brief_date }}
         run: |
+          if [[ "$GITHUB_EVENT_NAME" == "push" && ! -f automation/backfill-date.txt ]]; then
+            echo "No pending backfill request; skipping publish."
+            exit 0
+          fi
+          BRIEF_DATE="${BRIEF_DATE:-${{ inputs.brief_date }}}"
           BRIEF_DATE="${BRIEF_DATE:-$(date +%F)}"
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            git rm automation/backfill-date.txt
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "content/${BRIEF_DATE}.json"
