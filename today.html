@@ -1339,8 +1339,8 @@ html>body{padding:0}</style>
         #daily-list-app .d-learning-apply h3 { font-size:15px; font-weight:500; margin:0 0 7px; }
         #daily-list-app .d-learning-apply p { color:var(--d-text); line-height:1.7; }
         #daily-list-app .d-week-theme { background:var(--d-soft); border-radius:16px; padding:15px; margin:4px 4px 14px; }
-        #daily-list-app .d-week-theme strong { display:block; font-size:15px; font-weight:500; margin-bottom:4px; }
-        #daily-list-app .d-week-theme p { color:var(--d-sub); font-size:13px; margin:0; }
+        #daily-list-app .d-week-theme strong { display:block; font-size:17px; font-weight:600; margin:0; }
+        #daily-list-app .d-week-theme p { display:none; }
         #daily-list-app .d-day-focus { background:var(--d-surface); border:1px solid var(--d-line); border-radius:14px; padding:13px 15px; margin:0 4px 14px; }
         #daily-list-app .d-day-focus strong { display:block; font-size:14px; font-weight:600; margin-bottom:4px; }
         #daily-list-app .d-day-focus p { color:var(--d-sub); font-size:13px; margin:0; }
@@ -1589,7 +1589,8 @@ Total output lines: 180
     function renderEdition(edition, isTodayFallback = false) {
       selectedEdition = edition;
       const liveNews = (edition?.news || (isTodayFallback ? fallbackEdition.news : [])).map(item => ({...item,source:item.source || item.sources?.[0]?.url || "#"}));
-      const liveKnowledge = edition?.knowledge || (isTodayFallback ? fallbackEdition.knowledge : []);
+      const liveKnowledge = [...(edition?.knowledge || (isTodayFallback ? fallbackEdition.knowledge : []))]
+        .sort((a,b) => Number(String(a.category || "").includes("舒适圈外")) - Number(String(b.category || "").includes("舒适圈外")));
       const liveReflections = edition?.news ? edition.news.map(item => ({answer:item.answer,tension:item.tension,options:item.options,correct:item.correct,explanation:item.explanation})) : (isTodayFallback ? fallbackEdition.reflections : []);
       const liveQuestions = edition?.knowledge ? edition.knowledge.map(item => item.questions || []) : (isTodayFallback ? fallbackEdition.questions : []);
       newsItems.splice(0, newsItems.length, ...liveNews);
