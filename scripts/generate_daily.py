@@ -134,7 +134,7 @@ def fetch_feed(name: str, url: str) -> list[dict]:
             "publisher": name.split("·")[0],
             "feed": name,
             "title": title[:240],
-            "summary": clean_text(summary)[:1800],
+            "summary": clean_text(summary)[:700],
             "url": link,
             "published": timestamp.isoformat() if timestamp else published[:80],
         })
@@ -165,7 +165,7 @@ def gather_sources() -> list[dict]:
         for items in by_feed.values():
             if index < len(items):
                 balanced.append(items[index])
-    return balanced[:48]
+    return balanced[:24]
 
 
 def week_theme_context(today: dt.date) -> tuple[str, str, list[dict]]:
