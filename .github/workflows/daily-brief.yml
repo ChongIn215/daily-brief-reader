@@ -2,7 +2,7 @@ name: Generate daily brief
 
 on:
   schedule:
-    - cron: "30 23 * * *" # 07:30 China Standard Time
+    - cron: "0 0 * * *" # 08:00 China Standard Time
   workflow_dispatch:
 
 permissions:
