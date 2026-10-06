@@ -1825,6 +1825,7 @@ Total output lines: 180
     }));
     progress.news = new Set(weekReads[todayDateKey].news);
     progress.knowledge = new Set(weekReads[todayDateKey].knowledge);
+    let daySwitchToken = 0;
     let selectedDay = todayWeekday;
     listApp.querySelectorAll("[data-weekday]").forEach(button => button.setAttribute("aria-pressed", String(Number(button.dataset.weekday) === todayWeekday)));
     function updateWeekStatus() {
@@ -1868,6 +1869,7 @@ Total output lines: 180
       });
     }
     weekButtons.forEach(button => button.addEventListener("click", async () => {
+      const requestToken = ++daySwitchToken;
       selectedDay = Number(button.dataset.weekday);
       const selectedDateKey = button.dataset.date;
       progress.news = new Set(weekReads[selectedDateKey].news);
@@ -1877,6 +1879,7 @@ Total output lines: 180
         edition = await fetchEdition(selectedDateKey);
         if (edition) editionCache.set(selectedDateKey, edition);
       }
+      if (requestToken !== daySwitchToken) return;
       const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${selectedDateKey}T12:00:00+08:00`));
       document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
       renderEdition(edition, Boolean(edition?._isFallback));
