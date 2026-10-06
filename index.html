@@ -2582,7 +2582,7 @@ html>body{padding:0}</style>
     ?.addEventListener("load", initialize, { once: true });
 })();
 </script>
-<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}))}</script>
+<script>if("serviceWorker" in navigator){let hadController=Boolean(navigator.serviceWorker.controller);navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController)location.reload();hadController=true});window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}))}</script>
 
 </body>
 </html>
