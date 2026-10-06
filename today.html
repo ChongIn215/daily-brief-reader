@@ -1568,7 +1568,8 @@ Total output lines: 180
     const editionCache = new Map([[todayDateKey, {date:todayDateKey,...fallbackEdition,_isFallback:true}]]);
     async function fetchEdition(dateKey) {
       try {
-        const response = await fetch(`./content/${dateKey}.json?v=${Date.now()}`, {cache:"no-store"});
+        const contentBase = location.protocol === "file:" ? "https://chongin215.github.io/daily-brief-reader/content/" : "./content/";
+        const response = await fetch(`${contentBase}${dateKey}.json?v=${Date.now()}`, {cache:"no-store"});
         if (!response.ok) return null;
         const edition = await response.json();
         return edition.date === dateKey && Array.isArray(edition.news) && Array.isArray(edition.knowledge) ? edition : null;
@@ -1666,8 +1667,9 @@ Total output lines: 180
           }
           return;
         }
-        todayDateKey = edition.date;
         editionCache.set(todayDateKey, edition);
+        if (selectedDay !== todayWeekday) return;
+        todayDateKey = edition.date;
         const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
         document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
         renderEdition(edition, false);
