@@ -82,7 +82,7 @@ def parse_date(value: str) -> dt.datetime | None:
             return None
 
 
-def fetch_feed(name: str, url: str) -> list[dict]:
+def fetch_feed(name: str, url: str, reference_date: dt.date) -> list[dict]:
     request = urllib.request.Request(url, headers={"User-Agent": "DailyBriefReader/1.0 (RSS reader)"})
     try:
         with urllib.request.urlopen(request, timeout=18) as response:
@@ -125,8 +125,9 @@ def fetch_feed(name: str, url: str) -> list[dict]:
         # Xinhua's legacy RSS). Never present undated items as today's news.
         if not timestamp:
             continue
-        age_seconds = (dt.datetime.now(TZ) - timestamp).total_seconds()
-        if age_seconds > 72 * 3600 or age_seconds < -6 * 3600:
+        reference_end = dt.datetime.combine(reference_date, dt.time.max, tzinfo=TZ)
+        age_seconds = (reference_end - timestamp).total_seconds()
+        if age_seconds > 72 * 3600 or age_seconds < 0:
             continue
         source_id = hashlib.sha1((name + "\n" + link).encode()).hexdigest()[:10]
         found.append({
@@ -141,10 +142,10 @@ def fetch_feed(name: str, url: str) -> list[dict]:
     return found
 
 
-def gather_sources() -> list[dict]:
+def gather_sources(reference_date: dt.date) -> list[dict]:
     all_items: list[dict] = []
     for name, url in FEEDS:
-        all_items.extend(fetch_feed(name, url))
+        all_items.extend(fetch_feed(name, url, reference_date))
         time.sleep(0.1)
     seen: set[str] = set()
     unique: list[dict] = []
@@ -389,6 +390,7 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date, stabl
     outside_count = sum("舒适圈外" in item["category"] for item in normalized_knowledge)
     if core_count < 2 or outside_count < 1:
         raise RuntimeError(f"Knowledge mix failed (core={core_count}, outside={outside_count}); need at least 2 core and 1 outside-discipline cards.")
+    normalized_knowledge.sort(key=lambda item: "舒适圈外" in item["category"])
 
     theme = raw.get("weeklyTheme") if isinstance(raw.get("weeklyTheme"), dict) else {}
     daily_focus = raw.get("dailyFocus") if isinstance(raw.get("dailyFocus"), dict) else {}
@@ -397,7 +399,7 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date, stabl
         "date": today.isoformat(),
         "generatedAt": dt.datetime.now(TZ).isoformat(timespec="minutes"),
         "weeklyTheme": {
-            "title": str(stable_theme or theme.get("title", "本周学习主题"))[:160],
+            "title": str(stable_theme or theme.get("title", "本周学习主题"))[:48],
             "description": str(stable_theme_description or theme.get("description", ""))[:500],
         },
         "dailyFocus": {
@@ -417,7 +419,7 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date, stabl
 def main() -> None:
     today = dt.date.fromisoformat(os.environ["BRIEF_DATE"]) if os.environ.get("BRIEF_DATE") else local_today()
     theme, description, archive = week_theme_context(today)
-    sources = gather_sources()
+    sources = gather_sources(today)
     print(f"Collected {len(sources)} recent RSS entries from primary outlets.")
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
