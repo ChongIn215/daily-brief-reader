@@ -1,0 +1,52 @@
+name: Generate daily brief
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/daily-brief.yml"
+      - "scripts/generate_daily.py"
+      - "index.html"
+      - "service-worker.js"
+  schedule:
+    - cron: "30 23 * * *" # 07:30 China Standard Time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-brief-generation
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the website
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate today's edition with DeepSeek
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TZ: Asia/Shanghai
+        run: python scripts/generate_daily.py
+
+      - name: Publish the dated edition
+        env:
+          TZ: Asia/Shanghai
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "content/$(date +%F).json"
+          if git diff --cached --quiet; then
+            echo "Today's edition did not change; nothing to publish."
+            exit 0
+          fi
+          git commit -m "Publish daily brief for $(date +%F)"
+          git push

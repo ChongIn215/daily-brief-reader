@@ -1324,6 +1324,7 @@ html>body{padding:0}</style>
         #daily-list-app .d-quiz button[aria-pressed="true"] { border-color:var(--d-blue); background:var(--d-soft); }
         #daily-list-app .d-feedback { min-height:21px; color:var(--d-sub); font-size:13px; }
         #daily-list-app .d-source { display:inline-block; color:var(--d-blue); text-decoration:none; padding:11px 0; }
+        #daily-list-app .d-source-list a { display:block; color:var(--d-blue); text-decoration:none; font-size:13px; padding:3px 0; }
         #daily-list-app .d-finish { display:block; width:100%; color:#fff; background:var(--d-blue); border:0; border-radius:13px; min-height:44px; margin:9px 0; font:inherit; font-weight:500; cursor:pointer; }
         #daily-list-app .d-knowledge-full { display:none; padding:14px 21px 24px; }
         #daily-list-app .d-knowledge-full.is-visible { display:block; }
@@ -1350,7 +1351,7 @@ html>body{padding:0}</style>
         @media (max-width:360px) { #daily-list-app { border-radius:20px; } #daily-list-app .d-top { padding-inline:16px; } }
       </style>
       <header class="d-top">
-        <div class="d-date">星期一 · 10月5日</div>
+        <div class="d-date" data-current-date></div>
         <h1>每日速览</h1>
         <div class="d-subtitle">重点先看，感兴趣再进精读</div>
       </header>
@@ -1396,7 +1397,7 @@ html>body{padding:0}</style>
         <div class="d-question d-question-answer"><strong data-answer-question></strong><p data-detail-answer></p></div>
         <div class="d-analysis"><h3>争议与现实困境</h3><p data-detail-tension></p></div>
         <div class="d-quiz"><h3>再检验一下你的判断</h3><div data-quiz-list></div></div>
-        <a class="d-source" href="#" target="_blank" rel="noreferrer">仍想看原文 ↗</a>
+        <a class="d-source" href="#" target="_blank" rel="noreferrer">仍想看原文 ↗</a><div class="d-source-list" data-detail-sources></div>
         <button class="d-finish" type="button">读完这篇，记入今日进度</button>
       </main>
       <main class="d-knowledge-full" aria-live="polite">
@@ -1504,7 +1505,7 @@ html>body{padding:0}</style>
       </main>
     </div>
   </section>
-  <script>
+  <script type="module">
     const newsItems = [
       {category:"国内 · 公共服务",length:"长读 · 3分钟",title:"国庆客流创新高，公共服务能否跟上？",excerpt:"跨区域出行、假日消费持续升温，也让交通、充电和县域接待能力面临压力。",why:"假日繁荣不只看人流，也要看公共服务能否承接高峰。",question:"假期客流从大城市扩散到县域时，哪些公共服务最容易成为短板？",body:["今年国庆假期，跨区域出行规模维持高位。铁路客流创下单日纪录，景区、商圈和乡村目的地也迎来大量游客。报道所呈现的，不只是消费热度，也包括服务系统如何应对集中需求：高速服务区需要分流充电车辆，县域目的地要承接住宿、交通和公共设施需求，交通部门则要持续调度路网。","假日客流带来消费和地方收入，也会暴露服务能力的不均衡。尤其当出游从热门城市转向县城和乡村，基础设施、信息服务与当地承载能力是否匹配，会直接影响游客体验，也影响居民日常生活。"],answer:"常见短板包括高峰时段交通接驳、充电与停车、卫生和应急服务，以及准确及时的出行信息。不能只看游客总量，还应看等待时间、设施可用率和当地居民是否被挤占服务资源。",quiz:"判断服务是否跟上，哪组指标更有用？",options:["只看游客总数和消费额","再看等待时间、设施可用率和居民影响"],correct:1,source:"https://news.bjd.com.cn/2026/10/05/11983964.shtml"},
       {category:"中文互联网 · 消费",length:"短读 · 2分钟",title:"“景区冤种三件套”为什么又成了话题？",excerpt:"文创雪糕、冰箱贴和限定护手霜的同质化，让“地方特色”与场景溢价受到质疑。",why:"热议背后，是消费者在重新判断什么才算有地方特色、值得付费。",question:"当纪念品换掉地名就能在别处卖，它还代表这个地方吗？",body:["“冤种三件套”通常指景区护手霜、地标冰箱贴和文创雪糕。媒体观察到，不少商品靠“限定”“到此一游”等标签吸引游客，但设计和供应链高度相似。手机比价让场景溢价更容易被看见。","文章的核心判断不是年轻人不愿消费，而是更愿意为真正有地方文化、体验感和诚意的产品付费。商品的价值不只在功能，也在它能否承载地方记忆；如果只是换个地名，符号就会变空。"],answer:"要看商品背后的设计、生产和故事是否真的来自当地，而不只看包装标签。还需谨慎区分“平台上有人讨论”和“所有年轻人都这样消费”，热搜不能代表总体。",quiz:"讨论的核心矛盾是什么？",options:["年轻人不愿为旅行花钱","缺少地方内容，却靠场景和标签溢价"],correct:1,source:"https://www.infzm.com/contents/341713?source=134"},
@@ -1561,9 +1562,93 @@ html>body{padding:0}</style>
       {category:"大学生生活 · 秋招",title:"看 offer，除了月薪还要比较什么？",intro:"把看起来相似的两个录用条件拆成可比较的项目。",body:["生活例子：两个 offer 一个写“月薪较高，另有绩效”，另一个固定薪资略低但岗位职责清楚。只比较招聘海报上的月薪，很容易漏掉奖金是否保证、试用期薪酬、工作地点和通勤成本。先把同一口径的条件并排写下来。","把收入拆成固定部分、绩效或奖金、补贴等，并区分书面明确的条件和口头描述。再核对入职时间、试用安排、社保公积金说明；模糊处向招聘方书面确认。不同企业和地区的具体规则可能不同，不要只凭网上经验替代正式文件。","再估算城市生活成本：住房、通勤、餐饮和回家探亲的交通费。月薪略高但租住与通勤成本大很多，实际可支配金额未必更高。岗位职责、团队支持、成长机会、行业风险和自己愿意长期生活的城市，也都属于选择的一部分。","比较时不要把固定月薪、年终奖上限和口头承诺混成一个总数。可以分别列出“确定收入”“浮动收入”“需要确认”，避免把最乐观情景当作必然结果。职业选择也不是一次性定终身，试着评估这份工作能给下一步积累什么能力和作品。","现实运用：做一张两列对照表，先按自己最看重的三项排序，再补上风险和待确认问题。和家人、老师或朋友讨论时，带上自己的优先级，而不是只问“哪家公司名气大”。"],practice:"列出你最在意的三项：收入、地点、岗位内容、成长、稳定性或生活节奏。给offer排序时先用自己的标准，而不是只看别人说哪家公司名气大。",quiz:"两个岗位总包接近，但一个绩效占比高、书面条件不清，另一个固定收入较明确。比较时哪一步最稳妥？",options:["直接按招聘页面写的最高年薪比较","拆开固定与浮动收入，核实书面条件，并估算生活成本和岗位匹配","只看公司名气，其他条件入职后再说"],correct:1,explanation:"总包的口径可能不同，浮动奖金也不等于确定收入。先核实可兑现条件，再结合生活成本和职业目标比较，才能避免被单一数字带偏。"},
       {category:"舒适圈外 · 统计学寓言",title:"热度很高，能说明“大家都这么想”吗？",intro:"用一则村庄寓言，认识样本偏差和代表性。",body:["先听一个小故事：村里来了一位说书人，每晚只在河边广场讲故事。第二天他问广场上的人“大家都喜欢这个故事吗”，听到的当然大多是喜欢。可是没去广场的人——忙着照顾孩子的、住在山另一边的、根本不知道活动的人——没有机会回答。把广场里听到的声音当作全村意见，就会判断失准。","统计学把这类问题称为抽样偏差：进入样本的人不是从目标总体中公平地被观察到的。社交平台热榜也类似，算法推送、用户群体、活跃时间和互动意愿，会让某些内容格外可见。热度是真的“被很多次看见或互动”，但不等于随机抽到许多人后发现他们都认同。","还要分清几个不同概念：曝光量是内容被展示的次数，互动量是点赞评论转发等行为，认同则是态度。一个人可能因为惊讶、反感或想辟谣而转发；同一用户也可能多次互动。因此平台数字需要先说清统计口径，不能直接换算成“多少人支持”。","这不是说网络热度毫无价值。热点能帮助我们发现问题、观察话语如何传播，也能提示哪些群体愿意发声。只是如果要代表某个群体的意见，就要说明总体是谁、如何抽样、谁没回应，并用不同平台或调查相互核对。","做新媒体选题时，可以把“热搜爆了”写成“某平台某时段话题讨论升温”，而不是“全网都在讨论”或“年轻人一致认为”。统计学提供的不是泼冷水，而是让表达与证据的范围相匹配。"],practice:"找一个你最近看到的热搜，分别写下它能证明的事实、不能证明的结论，以及还想知道的样本信息。",quiz:"一条观点在热榜上持续出现。哪种表述最符合统计学上的证据边界？",options:["大多数年轻人都认同这条观点","该话题在此平台获得较高可见度，整体意见还需有代表性的调查","转发量可以作为认同人数的近似值","未评论的人可以按不认同来计算"],correct:1,explanation:"平台热度说明平台内的可见度或互动规模，受推荐机制、用户结构和重复互动影响。它不能直接给出总体认同比例。要推断年轻人的意见，需要界定年龄和地域范围、设计合适抽样、报告未回应情况，并区分曝光、互动与态度。"}
     ];
+    const fallbackEdition = {
+      news: JSON.parse(JSON.stringify(newsItems)),
+      extensions: JSON.parse(JSON.stringify(newsExtensions)),
+      reflections: JSON.parse(JSON.stringify(newsReflections)),
+      knowledge: JSON.parse(JSON.stringify(knowledgeItems)),
+      questions: JSON.parse(JSON.stringify(knowledgeQuestionSets)),
+    };
+    const shanghaiDateKey = date => new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(date);
+    const todayDateKey = shanghaiDateKey(new Date());
+    let selectedEdition = null;
+    async function fetchEdition(dateKey) {
+      try {
+        const response = await fetch(`./content/${dateKey}.json?v=${Date.now()}`, {cache:"no-store"});
+        if (!response.ok) return null;
+        const edition = await response.json();
+        return edition.date === dateKey && Array.isArray(edition.news) && Array.isArray(edition.knowledge) ? edition : null;
+      } catch { return null; }
+    }
+    function safeText(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+    function makeText(tag, className, value) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      node.textContent = value || "";
+      return node;
+    }
+    function renderEdition(edition, isTodayFallback = false) {
+      selectedEdition = edition;
+      const liveNews = (edition?.news || (isTodayFallback ? fallbackEdition.news : [])).map(item => ({...item,source:item.source || item.sources?.[0]?.url || "#"}));
+      const liveKnowledge = edition?.knowledge || (isTodayFallback ? fallbackEdition.knowledge : []);
+      const liveReflections = edition?.news ? edition.news.map(item => ({answer:item.answer,tension:item.tension,options:item.options,correct:item.correct,explanation:item.explanation})) : (isTodayFallback ? fallbackEdition.reflections : []);
+      const liveQuestions = edition?.knowledge ? edition.knowledge.map(item => item.questions || []) : (isTodayFallback ? fallbackEdition.questions : []);
+      newsItems.splice(0, newsItems.length, ...liveNews);
+      newsExtensions.splice(0, newsExtensions.length, ...(edition?.news ? edition.news.map(() => []) : (isTodayFallback ? fallbackEdition.extensions : [])));
+      newsReflections.splice(0, newsReflections.length, ...liveReflections);
+      knowledgeItems.splice(0, knowledgeItems.length, ...liveKnowledge);
+      knowledgeQuestionSets.splice(0, knowledgeQuestionSets.length, ...liveQuestions);
+
+      const newsList = document.querySelector('[data-list="news"]');
+      newsList.querySelectorAll(".d-item").forEach(node => node.remove());
+      liveNews.forEach((item,index) => {
+        const card = makeText("button","d-item",""); card.type="button"; card.dataset.story=String(index);
+        const meta=makeText("div","d-item-top","");
+        meta.append(makeText("span","",item.category),makeText("span","d-length",item.length || "长读 · 8分钟"));
+        card.append(meta,makeText("h2","",item.title),makeText("p","d-excerpt",item.excerpt),makeText("div","d-read",isTodayFallback?"示例内容":progress.news.has(index)?"已读 ✓":"阅读全文 ›"));
+        card.lastChild.dataset.readLabel=String(index); newsList.append(card);
+      });
+
+      const knowledgeList = document.querySelector('[data-list="knowledge"]');
+      knowledgeList.querySelectorAll(".d-knowledge-card").forEach(node => node.remove());
+      liveKnowledge.forEach((item,index) => {
+        const card=makeText("article",item.category?.includes("舒适圈外")?"d-knowledge-card d-bridge":"d-knowledge-card","");
+        card.append(makeText("div","d-tag",item.category),makeText("h2","",item.title),makeText("p","",item.intro));
+        const button=makeText("button","",isTodayFallback?"示例内容":"进入学习 ›"); button.type="button"; button.dataset.knowledge=String(index); card.append(button);
+        knowledgeList.insertBefore(card,knowledgeList.querySelector("[data-open-weekly-summary]"));
+      });
+
+      const theme = edition?.weeklyTheme;
+      const themeBox = knowledgeList.querySelector(".d-week-theme");
+      if (themeBox && theme) {
+        themeBox.querySelector("strong").textContent=theme.title || "本周学习主题";
+        themeBox.querySelector("p").textContent=theme.description || "";
+      }
+      const recap = edition?.weeklyRecap;
+      const summary = document.querySelector(".d-weekly-summary");
+      if (summary && recap?.body) {
+        summary.querySelector("h2").textContent=recap.title || "本周串联总结";
+        summary.querySelectorAll("p").forEach(node=>node.remove());
+        String(recap.body).split(/\n\n+/).filter(Boolean).forEach(paragraph=>summary.append(makeText("p","",paragraph)));
+      }
+      if (summary && !recap?.body) {
+        summary.querySelectorAll("p").forEach(node=>node.remove());
+      }
+      const empty = newsList.querySelector("[data-content-empty]");
+      if (empty) empty.remove();
+      if (!liveNews.length && !liveKnowledge.length) {
+        const notice=makeText("p","d-section-label",edition ? "这一天的内容还没有存档；已有打卡记录仍会保留。" : "今天的简报还没生成，生成后刷新页面即可阅读。"); notice.dataset.contentEmpty="true"; newsList.append(notice);
+      }
+    }
+    const firstEdition = await fetchEdition(todayDateKey);
+    renderEdition(firstEdition, false);
+    const dateLabel = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
+    document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = dateLabel);
     const listApp = document.getElementById("daily-list-app");
     const swipeApp = document.getElementById("daily-swipe-app");
-    const saved = window.openai?.widgetState?.modelContent;
+    let localSaved = {};
+    try { localSaved = JSON.parse(localStorage.getItem("dailyBriefProgress") || "{}"); } catch {}
+    const saved = window.openai?.widgetState?.modelContent || localSaved;
     const progress = { news: new Set(Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
     const dailyGoals = { news: 6, knowledge: 2 };
     let currentMode = "news";
@@ -1571,7 +1656,11 @@ html>body{padding:0}</style>
     let detailIndex = 0;
     let detailKnowledgeIndex = 0;
     let activeApp = listApp;
-    function persistProgress() { window.openai?.setWidgetState?.({modelContent:{news:[...progress.news],knowledge:[...progress.knowledge],weekReads}}).catch(()=>{}); }
+    function persistProgress() {
+      try { localStorage.setItem("dailyBriefProgress", JSON.stringify({news:[...progress.news],knowledge:[...progress.knowledge],weekReads})); } catch {}
+      const pending = window.openai?.setWidgetState?.({modelContent:{news:[...progress.news],knowledge:[...progress.knowledge],weekReads}});
+      pending?.catch?.(()=>{});
+    }
     function updateProgress(app, mode) {
       const set = progress[mode];
       const total = dailyGoals[mode];
@@ -1607,14 +1696,19 @@ html>body{padding:0}</style>
       detail.querySelector("[data-detail-title]").textContent = item.title;
       detail.querySelector("[data-detail-deck]").textContent = item.excerpt;
       detail.querySelector("[data-reading-time]").textContent = item.length.startsWith("长") ? "8" : "5";
-      detail.querySelector("[data-detail-body]").innerHTML = [...item.body, ...(newsExtensions[index] || [])].map(p => `<p>${p}</p>`).join("");
-      detail.querySelector("[data-detail-question]").textContent = item.question;
-      detail.querySelector("[data-answer-question]").textContent = item.question;
-      detail.querySelector("[data-detail-answer]").textContent = newsReflections[index].answer;
-      detail.querySelector("[data-detail-tension]").textContent = newsReflections[index].tension;
-      const reflection = newsReflections[index];
-      detail.querySelector("[data-quiz-list]").innerHTML = `<section class="d-quiz-group"><h4>${item.quiz}</h4>${reflection.options.map((option,i) => `<button type="button" data-option="${i}" aria-pressed="false">${String.fromCharCode(65+i)}. ${option}</button>`).join("")}<p class="d-feedback" aria-live="polite"></p></section>`;
+      detail.querySelector("[data-detail-body]").innerHTML = [...(item.body || []), ...(newsExtensions[index] || [])].map(p => `<p>${safeText(p)}</p>`).join("");
+      detail.querySelector("[data-detail-question]").textContent = item.question || "读完后，你认为这件事最值得继续追问的是什么？";
+      detail.querySelector("[data-answer-question]").textContent = item.question || "读完后，你认为这件事最值得继续追问的是什么？";
+      detail.querySelector("[data-detail-answer]").textContent = newsReflections[index]?.answer || item.answer || "请结合文章中的事实，区分已经确认的信息与仍待观察的问题。";
+      detail.querySelector("[data-detail-tension]").textContent = newsReflections[index]?.tension || item.tension || "";
+      const reflection = newsReflections[index] || {options:item.options || [],correct:item.correct ?? 0,explanation:item.explanation || ""};
+      detail.querySelector("[data-quiz-list]").innerHTML = `<section class="d-quiz-group"><h4>${safeText(item.quiz)}</h4>${reflection.options.map((option,i) => `<button type="button" data-option="${i}" aria-pressed="false">${String.fromCharCode(65+i)}. ${safeText(option)}</button>`).join("")}<p class="d-feedback" aria-live="polite"></p></section>`;
       detail.querySelector(".d-source").href = item.source;
+      detail.querySelector(".d-source").textContent = "查看原文来源 ↗";
+      const sourceList = detail.querySelector("[data-detail-sources]");
+      sourceList.replaceChildren(...(item.sources || []).map(source => {
+        const link=document.createElement("a"); link.href=source.url; link.target="_blank"; link.rel="noreferrer"; link.textContent=source.name; return link;
+      }));
       detail.querySelector(".d-finish").textContent = progress.news.has(index) ? "已读 ✓" : "读完这篇，记入今日进度";
       detail.querySelectorAll("[data-option]").forEach(button => button.addEventListener("click", () => {
         const chosen = Number(button.dataset.option);
@@ -1645,13 +1739,13 @@ html>body{padding:0}</style>
       const view = listApp.querySelector(".d-knowledge-full");
       view.classList.add("is-visible");
       window.scrollTo(0, 0);
-      view.classList.toggle("d-bridge-view", index === 3);
+      view.classList.toggle("d-bridge-view", item.category?.includes("舒适圈外"));
       view.querySelector("[data-k-tag]").textContent = item.category;
       view.querySelector("[data-k-title]").textContent = item.title;
-      view.querySelector("[data-k-body]").innerHTML = item.body.map(p => `<p>${p}</p>`).join("");
+      view.querySelector("[data-k-body]").innerHTML = (item.body || []).map(p => `<p>${safeText(p)}</p>`).join("");
       view.querySelector("[data-k-practice]").textContent = item.practice;
-      const questions = knowledgeQuestionSets[index];
-      view.querySelector("[data-k-quiz-list]").innerHTML = questions.map((question,q) => `<section class="d-quiz-group"><h4>${q+1}. ${question.prompt}</h4>${question.options.map((option,i) => `<button type="button" data-k-question="${q}" data-k-option="${i}" aria-pressed="false">${String.fromCharCode(65+i)}. ${option}</button>`).join("")}<p class="d-quiz-explanation" data-k-feedback="${q}" aria-live="polite"></p></section>`).join("");
+      const questions = knowledgeQuestionSets[index] || item.questions || [];
+      view.querySelector("[data-k-quiz-list]").innerHTML = questions.map((question,q) => `<section class="d-quiz-group"><h4>${q+1}. ${safeText(question.prompt)}</h4>${question.options.map((option,i) => `<button type="button" data-k-question="${q}" data-k-option="${i}" aria-pressed="false">${String.fromCharCode(65+i)}. ${safeText(option)}</button>`).join("")}<p class="d-quiz-explanation" data-k-feedback="${q}" aria-live="polite"></p></section>`).join("");
       view.querySelectorAll("[data-k-option]").forEach(button => button.addEventListener("click", () => {
         const q = Number(button.dataset.kQuestion), chosen = Number(button.dataset.kOption), question = questions[q];
         view.querySelectorAll(`[data-k-question="${q}"]`).forEach(option => option.setAttribute("aria-pressed", String(option === button)));
@@ -1679,10 +1773,22 @@ html>body{padding:0}</style>
     }));
     const weekButtons = [...listApp.querySelectorAll("[data-weekday]")];
     const weekReads = Object.fromEntries(weekButtons.map(button => { const savedDay=saved?.weekReads?.[button.dataset.weekday]; return [button.dataset.weekday, {news:Array.isArray(savedDay?.news)?savedDay.news:[], knowledge:Array.isArray(savedDay?.knowledge)?savedDay.knowledge:[]}]; }));
-    if (!weekReads[0].news.length) weekReads[0].news = [...progress.news];
-    if (!weekReads[0].knowledge.length) weekReads[0].knowledge = [...progress.knowledge];
-    let selectedDay = 0;
-    const dayLabels = ["10月5日 · 今天","10月6日","10月7日","10月8日","10月9日","10月10日","10月11日"];
+    const dayNames = ["周一","周二","周三","周四","周五","周六","周日"];
+    const todayWeekday = (new Date(`${todayDateKey}T00:00:00+08:00`).getUTCDay()+6)%7;
+    const todayAtMidnight = new Date(`${todayDateKey}T00:00:00+08:00`);
+    const mondayAtMidnight = new Date(todayAtMidnight.getTime()-todayWeekday*86400000);
+    const dayLabels = weekButtons.map((button,index) => {
+      const date = new Date(mondayAtMidnight.getTime()+index*86400000);
+      const key = shanghaiDateKey(date);
+      button.dataset.date=key;
+      button.innerHTML=`${dayNames[index]}<br>${Number(key.slice(-2))}日`;
+      button.disabled=key>todayDateKey;
+      return key===todayDateKey ? `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日 · 今天` : `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日`;
+    });
+    let selectedDay = todayWeekday;
+    listApp.querySelectorAll("[data-weekday]").forEach(button => button.setAttribute("aria-pressed", String(Number(button.dataset.weekday) === todayWeekday)));
+    if (!weekReads[selectedDay].news.length) weekReads[selectedDay].news = [...progress.news];
+    if (!weekReads[selectedDay].knowledge.length) weekReads[selectedDay].knowledge = [...progress.knowledge];
     function updateWeekStatus() {
       const goalDone = day => weekReads[day].news.length >= dailyGoals.news && weekReads[day].knowledge.length >= dailyGoals.knowledge;
       weekButtons.forEach(button => {
@@ -1693,8 +1799,15 @@ html>body{padding:0}</style>
       });
       const streak = Math.max(...weekButtons.map((_,end) => { let run=0; for(let day=end;day>=0&&goalDone(day);day--) run++; return run; }));
       listApp.querySelector(".d-streak").textContent = `🔥 本周最长连续完成 ${streak} 天 · 可回看或补读本周内容`;
-      listApp.querySelector("[data-week-title]").textContent = `${dayLabels[selectedDay]} · ${selectedDay === 0 ? "今日" : "查看 / 补读"} · 候选新闻 10 条`;
-      listApp.querySelector("[data-open-weekly-summary]").classList.toggle("is-visible", selectedDay >= 5);
+      listApp.querySelector("[data-week-title]").textContent = `${dayLabels[selectedDay]} · ${selectedDay === todayWeekday ? "今日" : "查看 / 补读"} · 候选新闻 ${newsItems.length} 条`;
+      listApp.querySelector("[data-open-weekly-summary]").classList.toggle("is-visible", selectedDay >= 5 && Boolean(selectedEdition?.weeklyRecap?.body));
+      const recap=selectedEdition?.weeklyRecap;
+      if (recap?.body) {
+        const recapButton=listApp.querySelector("[data-open-weekly-summary]");
+        recapButton.querySelector(".d-tag").textContent=`周末 · ${dayLabels[5]}—${dayLabels[6]}`;
+        recapButton.querySelector("h2").textContent=recap.title || "本周串联总结";
+        recapButton.querySelector("p").textContent=recap.body.slice(0,100);
+      }
       renderNewsOrder();
     }
     function renderNewsOrder() {
@@ -1715,17 +1828,19 @@ html>body{padding:0}</style>
         button.textContent = isLearned ? "已学习 ✓" : "进入学习 ›";
       });
     }
-    weekButtons.forEach(button => button.addEventListener("click", () => {
+    weekButtons.forEach(button => button.addEventListener("click", async () => {
       selectedDay = Number(button.dataset.weekday);
       progress.news = new Set(weekReads[selectedDay].news);
       progress.knowledge = new Set(weekReads[selectedDay].knowledge);
+      const edition = await fetchEdition(button.dataset.date);
+      renderEdition(edition, false);
       listApp.querySelectorAll("[data-weekday]").forEach(day => day.setAttribute("aria-pressed", String(day === button)));
       updateProgress(listApp, currentMode);
       renderKnowledgeState();
       updateWeekStatus();
     }));
-    listApp.querySelectorAll("[data-story]").forEach(button => button.addEventListener("click", () => showDetail(Number(button.dataset.story))));
-    listApp.querySelectorAll("[data-knowledge]").forEach(button => button.addEventListener("click", () => showKnowledge(Number(button.dataset.knowledge))));
+    listApp.querySelector('[data-list="news"]').addEventListener("click", event => { const card=event.target.closest("[data-story]"); if(card && !card.closest('[data-list="news"]').hidden) showDetail(Number(card.dataset.story)); });
+    listApp.querySelector('[data-list="knowledge"]').addEventListener("click", event => { const button=event.target.closest("[data-knowledge]"); if(button) showKnowledge(Number(button.dataset.knowledge)); });
     function returnToList(closeView) {
       if (history.state?.dailyBriefView) history.back();
       else closeView();
@@ -1759,7 +1874,7 @@ html>body{padding:0}</style>
       listApp.querySelector('[data-tab="knowledge"]').click();
     }
     listApp.querySelector("[data-weekly-back]").addEventListener("click", () => returnToList(closeWeeklySummary));
-    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[selectedDay].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); listApp.querySelector(`[data-read-label="${detailIndex}"]`).textContent="已读 ✓"; closeDetail(); });
+    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[selectedDay].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); closeDetail(); });
     listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[selectedDay].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); closeKnowledge(); });
     updateProgress(listApp,"news");
     renderKnowledgeState();
