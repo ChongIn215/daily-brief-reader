@@ -179,6 +179,20 @@ def week_theme_context(today: dt.date) -> tuple[str, str, list[dict]]:
             return theme.get("title", ""), theme.get("description", ""), read_week_archive(monday, today)
         except Exception:
             pass
+    # When backfilling a missed Monday after later editions already exist,
+    # inherit this week's established theme instead of inventing a second one.
+    if today == monday:
+        for offset in range(1, 7):
+            later_path = CONTENT_DIR / f"{(monday + dt.timedelta(days=offset)).isoformat()}.json"
+            if not later_path.exists():
+                continue
+            try:
+                saved = json.loads(later_path.read_text(encoding="utf-8"))
+                theme = saved.get("weeklyTheme") or {}
+                if theme.get("title"):
+                    return theme.get("title", ""), theme.get("description", ""), read_week_archive(monday, today)
+            except Exception:
+                continue
     return "", "", read_week_archive(monday, today)
 
 
@@ -212,10 +226,10 @@ def call_model(today: dt.date, sources: list[dict], theme: str, theme_descriptio
 
 新闻正文是用户完整阅读的主体，禁止只写新闻提要。每篇3至5个自然段：至少4篇重点新闻各写700至1000个汉字，其余每篇至少400至600个汉字。交代事件进展、关键主体、已公布的具体信息和限制；RSS没有提供的事实不得补造，材料不够就换一条信息更完整的报道。每条news的answer至少120字，tension至少100字，explanation至少150字，要解释选项背后的判断依据而非复述答案。每条news字段：category,length,title,excerpt,question,body(字符串数组),answer,tension,quiz,options(正好4个不同且有迷惑性的选项),correct(0至3整数),explanation(清楚详细),sourceIds(至少1个主要可靠媒体；若来源不是人民网、新华网或中国新闻网，则至少2个独立出版机构)。选项不能靠明显错误选项凑数，错误项应代表常见但可辨析的误读。参考回答与解释不要重复正文。完整性优先于多列几条，输出至少6条，尽量达到10条；所有正文、回答、题解总长控制在可完整输出的范围内。
 
-每天返回4条知识：至少2条围绕本周一个具体且较小的学习主题，并来自用户感兴趣的社会学、心理学、人类学、政治学、新闻传播/广播电视或大学生与初入社会生活知识；另有1条舒适圈外学科知识，可轮换法律、医学、经济、地理、历史、统计等，用寓言或生活例子简单引入。知识不是新闻，不得假装当天发生；解释概念、来源/形成、如何检验或使用、现实例子。每条body 3段、至少450字；问题解释至少100字。每条knowledge字段：category,title,intro,body(字符串数组),practice,questions(1至2题，按内容复杂度决定；每题有prompt,options(正好4项),correct(0至3),explanation)。
+每天返回4条知识：至少2条围绕本周一个具体且较小的学习主题，并来自用户感兴趣的社会学、心理学、人类学、政治学、新闻传播/广播电视或大学生与初入社会生活知识；另有1条舒适圈外学科知识，可轮换法律、医学、经济、地理、历史、统计等，用寓言或生活例子简单引入。知识不是新闻，不得假装当天发生；解释概念、来源/形成、如何检验或使用、现实例子。每条body 3段、至少450字；问题解释至少100字。每条knowledge字段：category,title,intro,body(字符串数组),practice,questions(1至2题，按内容复杂度决定；每题有prompt,options(正好4项),correct(0至3),explanation)。生成顺序必须先列用户熟悉领域与大学生生活知识，所有“舒适圈外”知识统一放在列表最后。
 
 返回有效JSON对象，不要Markdown。顶层字段：weeklyTheme{title,description},dailyFocus{title,description},news(至少6条，目标10条，最多12条；不够时不要编造),knowledge(至少3条，目标4条，最多4条；其中至少2条category属于用户兴趣/大学生生活范围，至少1条category明确标为“舒适圈外”),weeklyRecap{title,body}。
-weeklyTheme是整周稳定的大主题/总问题，周一确定后周二至周日必须原样沿用，不得改名、换方向或把每日知识主题当成本周主题。dailyFocus是当天的小切口，必须是weeklyTheme的子问题；每天可以变化，但要让本周知识逐步回答同一个总问题。知识至少两条与本周主线及今日切口相关，舒适圈外知识也尽量说明它如何帮助理解主线。周末weeklyRecap必须明确回到weeklyTheme，串联本周已经出现的dailyFocus和知识，不得只罗列每天标题。周一选择一个足够具体、能在一周内讲清楚的大主题，并给当天第一个子问题。严格执行字段类型。"""
+weeklyTheme是整周稳定的大主题，title必须是简洁、像书名或章节名的短标题（建议不超过18个汉字），只用一句概括本周学什么，不要把总问题、解释或每日小问题塞进title。description可供编辑内部保持主线一致，但页面不展示。周一确定后周二至周日必须原样沿用weeklyTheme的title和description，不得改名、换方向或把每日知识主题当成本周主题。dailyFocus是当天的小切口，必须是weeklyTheme的子问题；每天可以变化，但要让本周知识逐步回答同一个总问题。知识至少两条与本周主线及今日切口相关，舒适圈外知识也尽量说明它如何帮助理解主线。周末weeklyRecap必须明确回到weeklyTheme，串联本周已经出现的dailyFocus和知识，不得只罗列每天标题。周一选择一个足够具体、能在一周内讲清楚的大主题，并给当天第一个子问题。严格执行字段类型。"""
 
     user_payload = {
         "today": today.isoformat(),
