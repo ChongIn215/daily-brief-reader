@@ -1553,7 +1553,9 @@ Total output lines: 180
       {category:"大学生生活 · 秋招",title:"看 offer，除了月薪还要比较什么？",intro:"把看起来相似的两个录用条件拆成可比较的项目。",body:["生活例子：两个 offer 一个写“月薪较高，另有绩效”，另一个固定薪资略低但岗位职责清楚。只比较招聘海报上的月薪，很容易漏掉奖金是否保证、试用期薪酬、工作地点和通勤成本。先把同一口径的条件并排写下来。","把收入拆成固定部分、绩效或奖金、补贴等，并区分书面明确的条件和口头描述。再核对入职时间、试用安排、社保公积金说明；模糊处向招聘方书面确认。不同企业和地区的具体规则可能不同，不要只凭网上经验替代正式文件。","再估算城市生活成本：住房、通勤、餐饮和回家探亲的交通费。月薪略高但租住与通勤成本大很多，实际可支配金额未必更高。岗位职责、团队支持、成长机会、行业风险和自己愿意长期生活的城市，也都属于选择的一部分。","比较时不要把固定月薪、年终奖上限和口头承诺混成一个总数。可以分别列出“确定收入”“浮动收入”“需要确认”，避免把最乐观情景当作必然结果。职业选择也不是一次性定终身，试着评估这份工作能给下一步积累什么能力和作品。","现实运用：做一张两列对照表，先按自己最看重的三项排序，再补上风险和待确认问题。和家人、老师或朋友讨论时，带上自己的优先级，而不是只问“哪家公司名气大”。"],practice:"列出你最在意的三项：收入、地点、岗位内容、成长、稳定性或生活节奏。给offer排序时先用自己的标准，而不是只看别人说哪家公司名气大。",quiz:"两个岗位总包接近，但一个绩效占比高、书面条件不清，另一个固定收入较明确。比较时哪一步最稳妥？",options:["直接按招聘页面写的最高年薪比较","拆开固定与浮动收入，核实书面条件，并估算生活成本和岗位匹配","只看公司名气，其他条件入职后再说"],correct:1,explanation:"总包的口径可能不同，浮动奖金也不等于确定收入。先核实可兑现条件，再结合生活成本和职业目标比较，才能避免被单一数字带偏。"},
       {category:"舒适圈外 · 统计学寓言",title:"热度很高，能说明“大家都这么想”吗？",intro:"用一则村庄寓言，认识样本偏差和代表性。",body:["先听一个小故事：村里来了一位说书人，每晚只在河边广场讲故事。第二天他问广场上的人“大家都喜欢这个故事吗”，听到的当然大多是喜欢。可是没去广场的人——忙着照顾孩子的、住在山另一边的、根本不知道活动的人——没有机会回答。把广场里听到的声音当作全村意见，就会判断失准。","统计学把这类问题称为抽样偏差：进入样本的人不是从目标总体中公平地被观察到的。社交平台热榜也类似，算法推送、用户群体、活跃时间和互动意愿，会让某些内容格外可见。热度是真的“被很多次看见或互动”，但不等于随机抽到许多人后发现他们都认同。","还要分清几个不同概念：曝光量是内容被展示的次数，互动量是点赞评论转发等行为，认同则是态度。一个人可能因为惊讶、反感或想辟谣而转发；同一用户也可能多次互动。因此平台数字需要先说清统计口径，不能直接换算成“多少人支持”。","这不是说网络热度毫无价值。热点能帮助我们发现问题、观察话语如何传播，也能提示哪些群体愿意发声。只是如果要代表某个群体的意见，就要说明总体是谁、如何抽样、谁没回应，并用不同平台或调查相互核对。","做新媒体选题时，可以把“热搜爆了”写成“某平台某时段话题讨论升温”，而不是“全网都在讨论”或“年轻人一致认为”。统计学提供的不是泼冷水，而是让表达与证据的范围相匹配。"],practice:"找一个你最近看到的热搜，分别写下它能证明的事实、不能证明的结论，以及还想知道的样本信息。",quiz:"一条观点在热榜上持续出现。哪种表述最符合统计学上的证据边界？",options:["大多数年轻人都认同这条观点","该话题在此平台获得较高可见度，整体意见还需有代表性的调查","转发量可以作为认同人数的近似值","未评论的人可以按不认同来计算"],correct:1,explanation:"平台热度说明平台内的可见度或互动规模，受推荐机制、用户结构和重复互动影响。它不能直接给出总体认同比例。要推断年轻人的意见，需要界定年龄和地域范围、设计合适抽样、报告未回应情况，并区分曝光、互动与态度。"}
     ];
-    const fallbackEdition = {
+    const newsExtensions = newsItems.map(() => []);
+        const newsReflections = newsItems.map(item => ({answer:item.answer, tension:"", options:item.options || [], correct:item.correct, explanation:""}));
+        const fallbackEdition = {
       news: JSON.parse(JSON.stringify(newsItems)),
       extensions: JSON.parse(JSON.stringify(newsExtensions)),
       reflections: JSON.parse(JSON.stringify(newsReflections)),
@@ -1567,17 +1569,20 @@ Total output lines: 180
     let selectedEdition = null;
     // Keep the demo fallback out of the date cache so it cannot replace a real daily edition when switching dates.
     const editionCache = new Map();
+    let editionState = "loading";
     async function fetchEdition(dateKey) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
       try {
         const contentBase = location.protocol === "file:" ? "https://chongin215.github.io/daily-brief-reader/content/" : "./content/";
-        const response = await fetch(`${contentBase}${dateKey}.json?v=${Date.now()}`, {cache:"no-store"});
-        if (!response.ok) return null;
+        const response = await fetch(`${contentBase}${dateKey}.json?v=${Date.now()}`, {cache:"no-store", signal:controller.signal});
+        if (response.status === 404) return {state:"missing", edition:null};
+        if (!response.ok) throw new Error(`Brief request failed: ${response.status}`);
         const edition = await response.json();
-        return edition.date === dateKey && Array.isArray(edition.news) && Array.isArray(edition.knowledge) ? edition : null;
-      } catch { return null; }
-    }
-    async function fetchLatestNearbyEdition(baseDateKey) {
-      return fetchEdition(baseDateKey);
+        if (edition.date !== dateKey || !Array.isArray(edition.news) || !Array.isArray(edition.knowledge)) throw new Error("Invalid daily edition");
+        return {state:"ready", edition};
+      } catch { return {state:"failed", edition:null}; }
+      finally { clearTimeout(timeout); }
     }
     function safeText(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
     function makeText(tag, className, value) {
@@ -1586,15 +1591,15 @@ Total output lines: 180
       node.textContent = value || "";
       return node;
     }
-    function renderEdition(edition, isTodayFallback = false) {
+    function renderEdition(edition) {
       selectedEdition = edition;
-      const liveNews = (edition?.news || (isTodayFallback ? fallbackEdition.news : [])).map(item => ({...item,source:item.source || item.sources?.[0]?.url || "#"}));
-      const liveKnowledge = [...(edition?.knowledge || (isTodayFallback ? fallbackEdition.knowledge : []))]
+      const liveNews = (edition?.news || []).map(item => ({...item,source:item.source || item.sources?.[0]?.url || "#"}));
+      const liveKnowledge = [...(edition?.knowledge || [])]
         .sort((a,b) => Number(String(a.category || "").includes("舒适圈外")) - Number(String(b.category || "").includes("舒适圈外")));
-      const liveReflections = edition?.news ? edition.news.map(item => ({answer:item.answer,tension:item.tension,options:item.options,correct:item.correct,explanation:item.explanation})) : (isTodayFallback ? fallbackEdition.reflections : []);
-      const liveQuestions = edition?.knowledge ? edition.knowledge.map(item => item.questions || []) : (isTodayFallback ? fallbackEdition.questions : []);
+      const liveReflections = liveNews.map(item => ({answer:item.answer,tension:item.tension,options:item.options || [],correct:item.correct,explanation:item.explanation}));
+      const liveQuestions = liveKnowledge.map(item => item.questions || []);
       newsItems.splice(0, newsItems.length, ...liveNews);
-      newsExtensions.splice(0, newsExtensions.length, ...(edition?.news ? edition.news.map(() => []) : (isTodayFallback ? fallbackEdition.extensions : [])));
+      newsExtensions.splice(0, newsExtensions.length, ...liveNews.map(() => []));
       newsReflections.splice(0, newsReflections.length, ...liveReflections);
       knowledgeItems.splice(0, knowledgeItems.length, ...liveKnowledge);
       knowledgeQuestionSets.splice(0, knowledgeQuestionSets.length, ...liveQuestions);
@@ -1605,7 +1610,7 @@ Total output lines: 180
         const card = makeText("button","d-item",""); card.type="button"; card.dataset.story=String(index);
         const meta=makeText("div","d-item-top","");
         meta.append(makeText("span","",item.category),makeText("span","d-length",item.length || "长读 · 8分钟"));
-        card.append(meta,makeText("h2","",item.title),makeText("p","d-excerpt",item.excerpt),makeText("div","d-read",isTodayFallback?"示例内容":progress.news.has(index)?"已读 ✓":"阅读全文 ›"));
+        card.append(meta,makeText("h2","",item.title),makeText("p","d-excerpt",item.excerpt),makeText("div","d-read",progress.news.has(index)?"已读 ✓":"阅读全文 ›"));
         card.lastChild.dataset.readLabel=String(index); newsList.append(card);
       });
 
@@ -1614,12 +1619,13 @@ Total output lines: 180
       liveKnowledge.forEach((item,index) => {
         const card=makeText("article",item.category?.includes("舒适圈外")?"d-knowledge-card d-bridge":"d-knowledge-card","");
         card.append(makeText("div","d-tag",item.category),makeText("h2","",item.title),makeText("p","",item.intro));
-        const button=makeText("button","",isTodayFallback?"示例内容":"进入学习 ›"); button.type="button"; button.dataset.knowledge=String(index); card.append(button);
+        const button=makeText("button","","进入学习 ›"); button.type="button"; button.dataset.knowledge=String(index); card.append(button);
         knowledgeList.insertBefore(card,knowledgeList.querySelector("[data-open-weekly-summary]"));
       });
 
       const theme = edition?.weeklyTheme;
       const themeBox = knowledgeList.querySelector(".d-week-theme");
+      if (themeBox) themeBox.hidden = !theme;
       if (themeBox && theme) {
         themeBox.querySelector("strong").textContent=theme.title || "本周学习主题";
         themeBox.querySelector("p").textContent=theme.description || "";
@@ -1643,50 +1649,21 @@ Total output lines: 180
       if (summary && !recap?.body) {
         summary.querySelectorAll("p").forEach(node=>node.remove());
       }
-      const empty = newsList.querySelector("[data-content-empty]");
-      if (empty) empty.remove();
-      if (!liveNews.length && !liveKnowledge.length) {
-        const notice=makeText("p","d-section-label",edition ? "这一天的内容还没有存档；已有打卡记录仍会保留。" : "今天的简报还没生成，生成后刷新页面即可阅读。"); notice.dataset.contentEmpty="true"; newsList.append(notice);
-      }
+      const emptyMessage = editionState === "loading" ? "正在读取简报…" : editionState === "missing" ? "这一天还没有简报存档；已有打卡记录仍会保留。" : editionState === "failed" ? "暂时无法读取简报，请检查网络后刷新重试。" : "这一天没有可阅读的内容。";
+      [[newsList,liveNews],[knowledgeList,liveKnowledge]].forEach(([list,items]) => {
+        list.querySelectorAll("[data-content-empty]").forEach(node => node.remove());
+        if (!items.length) {
+          const notice=makeText("p","d-section-label",emptyMessage); notice.dataset.contentEmpty="true"; list.append(notice);
+        }
+      });
     }
     const listApp = document.getElementById("daily-list-app");
-    const swipeApp = document.getElementById("daily-swipe-app");
     let localSaved = {};
     try { localSaved = JSON.parse(localStorage.getItem("dailyBriefProgress") || "{}"); } catch {}
     const saved = window.openai?.widgetState?.modelContent || localSaved;
     const progress = { news: new Set(saved?.date === todayDateKey && Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(saved?.date === todayDateKey && Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
     const dailyGoals = { news: 6, knowledge: 3 };
-    renderEdition(null, true);
-    async function loadLatestEdition() {
-      try {
-        const edition = await fetchLatestNearbyEdition(todayDateKey);
-        if (!edition) {
-          const newsList = document.querySelector('[data-list="news"]');
-          if (!newsList.querySelector("[data-content-empty]")) {
-            const notice = makeText("p", "d-section-label", "今日正式简报暂未加载；下面是离线示例，不代表今天的新闻。请检查网络后刷新页面。");
-            notice.dataset.contentEmpty = "true";
-            newsList.prepend(notice);
-          }
-          return;
-        }
-        editionCache.set(todayDateKey, edition);
-        if (selectedDay !== todayWeekday) return;
-        todayDateKey = edition.date;
-        const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
-        document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
-        renderEdition(edition, false);
-        updateAllProgress();
-        if (typeof renderWeek === "function") renderWeek();
-      } catch {
-        const newsList = document.querySelector('[data-list="news"]');
-        if (!newsList.querySelector("[data-content-empty]")) {
-          const notice = makeText("p", "d-section-label", "暂时无法连接今日简报；下面是离线示例，不代表今天的新闻。请检查网络后刷新页面。");
-          notice.dataset.contentEmpty = "true";
-          newsList.prepend(notice);
-        }
-      }
-    }
-    loadLatestEdition();
+    renderEdition(null);
     let currentMode = "news";
     let currentIndex = 0;
     let detailIndex = 0;
@@ -1732,7 +1709,7 @@ Total output lines: 180
       detail.querySelector("[data-detail-tag]").textContent = `${item.category} · ${item.length}`;
       detail.querySelector("[data-detail-title]").textContent = item.title;
       detail.querySelector("[data-detail-deck]").textContent = item.excerpt;
-      detail.querySelector("[data-reading-time]").textContent = item.length.startsWith("长") ? "8" : "5";
+      detail.querySelector("[data-reading-time]").textContent = (item.length || "").startsWith("长") ? "8" : "5";
       detail.querySelector("[data-detail-body]").innerHTML = [...(item.body || []), ...(newsExtensions[index] || [])].map(p => `<p>${safeText(p)}</p>`).join("");
       detail.querySelector("[data-detail-question]").textContent = item.question || "读完后，你认为这件事最值得继续追问的是什么？";
       detail.querySelector("[data-answer-question]").textContent = item.question || "读完后，你认为这件事最值得继续追问的是什么？";
@@ -1824,7 +1801,7 @@ Total output lines: 180
       return key===todayDateKey ? `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日 · 今天` : `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日`;
     });
     const weekReads = Object.fromEntries(weekButtons.map(button => {
-      const savedDay = saved?.weekKey === weekKey ? saved.weekReads?.[button.dataset.date] : null;
+      const savedDay = button.dataset.date <= todayDateKey ? (saved?.weekKey === weekKey ? saved.weekReads?.[button.dataset.date] : null) || (saved?.date === button.dataset.date ? saved : null) : null;
       return [button.dataset.date, {news:Array.isArray(savedDay?.news)?savedDay.news:[], knowledge:Array.isArray(savedDay?.knowledge)?savedDay.knowledge:[]}];
     }));
     progress.news = new Set(weekReads[todayDateKey].news);
@@ -1833,7 +1810,11 @@ Total output lines: 180
     let selectedDay = todayWeekday;
     listApp.querySelectorAll("[data-weekday]").forEach(button => button.setAttribute("aria-pressed", String(Number(button.dataset.weekday) === todayWeekday)));
     function updateWeekStatus() {
-      const goalDone = day => weekReads[day].news.length >= dailyGoals.news && weekReads[day].knowledge.length >= dailyGoals.knowledge;
+      const goalDone = index => {
+        const dateKey = weekButtons[index]?.dataset.date;
+        const reads = weekReads[dateKey];
+        return dateKey <= todayDateKey && Boolean(reads) && reads.news.length >= dailyGoals.news && reads.knowledge.length >= dailyGoals.knowledge;
+      };
       weekButtons.forEach(button => {
         const day = button.dataset.weekday;
         const dayReads = weekReads[button.dataset.date];
@@ -1843,7 +1824,7 @@ Total output lines: 180
       });
       const streak = Math.max(...weekButtons.map((_,end) => { let run=0; for(let day=end;day>=0&&goalDone(day);day--) run++; return run; }));
       listApp.querySelector(".d-streak").textContent = `🔥 本周最长连续完成 ${streak} 天 · 可回看或补读本周内容`;
-      listApp.querySelector("[data-week-title]").textContent = `${dayLabels[selectedDay]} · ${selectedDay === todayWeekday ? "今日" : "查看 / 补读"} · 候选新闻 ${newsItems.length} 条`;
+      listApp.querySelector("[data-week-title]").textContent = editionState === "loading" ? `${dayLabels[selectedDay]} · 正在读取简报…` : `${dayLabels[selectedDay]} · 候选新闻 ${newsItems.length} 条 · 目标任选 ${dailyGoals.news} 条`;
       listApp.querySelector("[data-open-weekly-summary]").classList.toggle("is-visible", selectedDay >= 5 && Boolean(selectedEdition?.weeklyRecap?.body));
       const recap=selectedEdition?.weeklyRecap;
       if (recap?.body) {
@@ -1872,26 +1853,28 @@ Total output lines: 180
         button.textContent = isLearned ? "已学习 ✓" : "进入学习 ›";
       });
     }
-    weekButtons.forEach(button => button.addEventListener("click", async () => {
+    async function loadSelectedDay(index) {
       const requestToken = ++daySwitchToken;
-      selectedDay = Number(button.dataset.weekday);
+      const button = weekButtons[index];
+      if (!button || button.disabled) return;
+      selectedDay = index;
       const selectedDateKey = button.dataset.date;
       progress.news = new Set(weekReads[selectedDateKey].news);
       progress.knowledge = new Set(weekReads[selectedDateKey].knowledge);
-      let edition = editionCache.get(selectedDateKey);
-      if (!edition) {
-        edition = await fetchEdition(selectedDateKey);
-        if (edition) editionCache.set(selectedDateKey, edition);
-      }
-      if (requestToken !== daySwitchToken) return;
       const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${selectedDateKey}T12:00:00+08:00`));
       document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
-      renderEdition(edition, Boolean(edition?._isFallback));
-      listApp.querySelectorAll("[data-weekday]").forEach(day => day.setAttribute("aria-pressed", String(day === button)));
-      updateProgress(listApp, currentMode);
-      renderKnowledgeState();
-      updateWeekStatus();
-    }));
+      editionState = "loading";
+      renderEdition(null);
+      updateAllProgress();
+      const cached = editionCache.get(selectedDateKey);
+      const result = cached ? {state:"ready",edition:cached} : await fetchEdition(selectedDateKey);
+      if (requestToken !== daySwitchToken) return;
+      if (result.edition) editionCache.set(selectedDateKey, result.edition);
+      editionState = result.state;
+      renderEdition(result.edition);
+      updateAllProgress();
+    }
+    weekButtons.forEach(button => button.addEventListener("click", () => loadSelectedDay(Number(button.dataset.weekday))));
     listApp.querySelector('[data-list="news"]').addEventListener("click", event => { const card=event.target.closest("[data-story]"); if(card && !card.closest('[data-list="news"]').hidden) showDetail(Number(card.dataset.story)); });
     listApp.querySelector('[data-list="knowledge"]').addEventListener("click", event => { const button=event.target.closest("[data-knowledge]"); if(button) showKnowledge(Number(button.dataset.knowledge)); });
     function returnToList(closeView) {
@@ -1927,111 +1910,18 @@ Total output lines: 180
       listApp.querySelector('[data-tab="knowledge"]').click();
     }
     listApp.querySelector("[data-weekly-back]").addEventListener("click", () => returnToList(closeWeeklySummary));
-    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[weekButtons[selectedDay].dataset.date].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); closeDetail(); });
-    listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[weekButtons[selectedDay].dataset.date].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); closeKnowledge(); });
+    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[weekButtons[selectedDay].dataset.date].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); returnToList(closeDetail); });
+    listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[weekButtons[selectedDay].dataset.date].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); returnToList(closeKnowledge); });
     updateProgress(listApp,"news");
     renderKnowledgeState();
     updateWeekStatus();
-    let swipeMode = "news";
-    let swipeIndex = 0;
-    let swipeDetailIndex = 0;
-    let swipeDetailMode = "news";
-    function updateSwipe() {
-      const items = swipeMode === "news" ? newsItems : knowledgeItems;
-      swipeIndex = Math.max(0, Math.min(swipeIndex, items.length - 1));
-      const item = items[swipeIndex];
-      swipeApp.querySelector(".s-stage").style.display = swipeMode === "news" ? "block" : "none";
-      swipeApp.querySelector(".s-nav").style.display = swipeMode === "news" ? "flex" : "none";
-      swipeApp.querySelector(".s-hint").style.display = swipeMode === "news" ? "block" : "none";
-      swipeApp.querySelector(".s-knowledge-list").classList.toggle("active", swipeMode === "knowledge");
-      swipeApp.querySelector(".s-reader").classList.remove("active");
-      swipeApp.querySelector("[data-s-progress-name]").textContent = swipeMode === "news" ? "新闻阅读" : "知识学习";
-      swipeApp.querySelector(".s-track").setAttribute("aria-label", swipeMode === "news" ? "新闻阅读进度" : "知识学习进度");
-      const set = progress[swipeMode];
-      const pct = Math.round(set.size / items.length * 100);
-      swipeApp.querySelector("[data-s-progress-count]").textContent = `${set.size} / ${items.length}`;
-      swipeApp.querySelector(".s-track span").style.width = `${pct}%`;
-      swipeApp.querySelector(".s-track").setAttribute("aria-valuenow", String(pct));
-      swipeApp.querySelector(`[data-s-count="${swipeMode}"]`).textContent = `${set.size}/${items.length}`;
-      if (swipeMode === "news") {
-        swipeApp.querySelector("[data-s-category]").textContent = `${item.category} · ${item.length}`;
-        swipeApp.querySelector("[data-s-counter]").textContent = `${swipeIndex + 1} / ${items.length}`;
-        swipeApp.querySelector("[data-s-title]").textContent = item.title;
-        swipeApp.querySelector("[data-s-excerpt]").textContent = item.excerpt;
-        swipeApp.querySelector("[data-s-why]").textContent = `值得看：${item.why}`;
-        swipeApp.querySelector("[data-s-question]").textContent = item.question;
-        swipeApp.querySelector("[data-s-done]").textContent = set.has(swipeIndex) ? "已读 ✓" : "标记读完";
-      }
+    function updateAllProgress() {
+      updateProgress(listApp, currentMode === "news" ? "knowledge" : "news");
+      updateProgress(listApp, currentMode);
+      renderKnowledgeState();
+      updateWeekStatus();
     }
-    function showSwipeDetail(index) {
-      swipeDetailMode = "news";
-      swipeDetailIndex = index;
-      const item = newsItems[index];
-      const view = swipeApp.querySelector(".s-reader");
-      view.classList.add("active");
-      swipeApp.querySelector(".s-stage").style.display="none";
-      swipeApp.querySelector(".s-nav").style.display="none";
-      swipeApp.querySelector(".s-hint").style.display="none";
-      view.querySelector("[data-s-detail-category]").textContent=`${item.category} · ${item.length}`;
-      view.querySelector("[data-s-detail-counter]").textContent=`${index+1} / ${newsItems.length}`;
-      view.querySelector("[data-s-detail-title]").textContent=item.title;
-      view.querySelector("[data-s-detail-body]").innerHTML=item.body.map(p=>`<p>${p}</p>`).join("");
-      view.querySelector("[data-s-detail-question]").textContent=item.question;
-      view.querySelector("[data-s-detail-answer]").textContent=item.answer;
-      view.querySelector("[data-s-quiz-question]").textContent=item.quiz;
-      view.querySelector("[data-s-quiz-options]").innerHTML=item.options.map((option,i)=>`<button type="button" data-s-option="${i}" aria-pressed="false">${option}</button>`).join("");
-      view.querySelector(".s-feedback").textContent="";
-      view.querySelector(".s-source").href=item.source;
-      view.querySelector("[data-s-detail-done]").textContent=progress.news.has(index)?"已读 ✓":"读完这篇，记入新闻进度";
-      view.querySelectorAll("[data-s-option]").forEach(button=>button.addEventListener("click",()=>{
-        const chosen=Number(button.dataset.sOption);
-        view.querySelectorAll("[data-s-option]").forEach(option=>option.setAttribute("aria-pressed",String(option===button)));
-        view.querySelector(".s-feedback").textContent=chosen===item.correct?"答对了：你抓到了文章的核心判断。":"再想一步：文章讨论的重点不只是表面现象，还包括背后的机制。";
-      }));
-    }
-    swipeApp.querySelectorAll("[data-mode]").forEach(button=>button.addEventListener("click",()=>{
-      swipeMode=button.dataset.mode; swipeIndex=0;
-      swipeApp.querySelectorAll("[data-mode]").forEach(tab=>tab.setAttribute("aria-pressed",String(tab===button)));
-      updateSwipe();
-    }));
-    swipeApp.querySelector("[data-s-next]").addEventListener("click",()=>{swipeIndex=(swipeIndex+1)%newsItems.length;updateSwipe();});
-    swipeApp.querySelector("[data-s-prev]").addEventListener("click",()=>{swipeIndex=(swipeIndex+newsItems.length-1)%newsItems.length;updateSwipe();});
-    swipeApp.querySelector("[data-s-open]").addEventListener("click",()=>showSwipeDetail(swipeIndex));
-    swipeApp.querySelector("[data-s-done]").addEventListener("click",()=>{progress.news.add(swipeIndex);persistProgress();updateSwipe();});
-    swipeApp.querySelector("[data-s-detail-done]").addEventListener("click",()=>{
-      progress[swipeDetailMode].add(swipeDetailIndex); persistProgress();
-      const items=swipeDetailMode==="news"?newsItems:knowledgeItems;
-      const pct=Math.round(progress[swipeDetailMode].size/items.length*100);
-      swipeApp.querySelector("[data-s-progress-count]").textContent=`${progress[swipeDetailMode].size} / ${items.length}`;
-      swipeApp.querySelector(".s-track span").style.width=`${pct}%`;
-      swipeApp.querySelector(".s-track").setAttribute("aria-valuenow",String(pct));
-      swipeApp.querySelector(`[data-s-count="${swipeDetailMode}"]`).textContent=`${progress[swipeDetailMode].size}/${items.length}`;
-      swipeApp.querySelector("[data-s-detail-done]").textContent=swipeDetailMode==="news"?"已读 ✓":"已学 ✓";
-    });
-    swipeApp.querySelector(".s-reader .s-back").addEventListener("click",()=>{
-      swipeApp.querySelector(".s-reader").classList.remove("active");
-      swipeApp.querySelector(".s-reader .s-prompt").style.display="";
-      swipeApp.querySelector(".s-reader .s-quiz").style.display="";
-      swipeApp.querySelector(".s-reader .s-source").style.display="";
-      swipeApp.querySelector("[data-s-detail-answer]").style.display="";
-      swipeApp.querySelector("[data-s-detail-answer]").parentElement.previousElementSibling.style.display="";
-      swipeApp.querySelector(".s-reader .s-back").textContent="‹ 返回翻阅";
-      updateSwipe();
-    });
-    swipeApp.querySelectorAll("[data-k-next]").forEach(button=>button.addEventListener("click",()=>{
-      const index=Number(button.dataset.kNext); const item=knowledgeItems[index]; swipeDetailMode="knowledge"; swipeDetailIndex=index;
-      const target=swipeApp.querySelector(".s-reader"); target.classList.add("active"); swipeApp.querySelector(".s-knowledge-list").classList.remove("active");
-      target.querySelector("[data-s-detail-category]").textContent=item.category; target.querySelector("[data-s-detail-counter]").textContent=`${index+1} / ${knowledgeItems.length}`; target.querySelector("[data-s-detail-title]").textContent=item.title;
-      target.querySelector("[data-s-detail-body]").innerHTML=item.body.map(p=>`<p>${p}</p>`).join("")+`<p><strong>试着应用：</strong>${item.practice}</p>`;
-      target.querySelector(".s-prompt").style.display="none"; target.querySelector("[data-s-detail-answer]").parentElement.previousElementSibling.style.display="none"; target.querySelector("[data-s-detail-answer]").style.display="none"; target.querySelector(".s-quiz").style.display="none"; target.querySelector(".s-source").style.display="none";
-      const done=target.querySelector("[data-s-detail-done]"); done.textContent=progress.knowledge.has(index)?"已学 ✓":"学完这条，记入知识进度";
-      target.querySelector(".s-back").textContent="‹ 返回知识列表";
-    }));
-    let touchStartX=0;
-    swipeApp.querySelector(".s-stage").addEventListener("pointerdown",event=>{touchStartX=event.clientX;});
-    swipeApp.querySelector(".s-stage").addEventListener("pointerup",event=>{const delta=event.clientX-touchStartX;if(Math.abs(delta)>45){swipeIndex=delta>0?(swipeIndex+1)%newsItems.length:(swipeIndex+newsItems.length-1)%newsItems.length;updateSwipe();}});
-    function updateAllProgress(){updateProgress(listApp,"news");updateProgress(listApp,"knowledge");updateSwipe();}
-    updateAllProgress();
+    loadSelectedDay(todayWeekday);
     window.addEventListener("openai:set_globals",event=>{const value=event.detail?.globals?.widgetState?.modelContent;if(value&&Array.isArray(value.news)&&Array.isArray(value.knowledge)){progress.news=new Set(value.news);progress.knowledge=new Set(value.knowledge);updateAllProgress();}});
   </script>
 </div>
