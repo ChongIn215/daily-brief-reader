@@ -1,4 +1,4 @@
-const CACHE_NAME = "daily-brief-shell-v7";
+const CACHE_NAME = "daily-brief-shell-v8";
 const APP_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", event => {

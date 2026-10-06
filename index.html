@@ -1570,7 +1570,7 @@ html>body{padding:0}</style>
       questions: JSON.parse(JSON.stringify(knowledgeQuestionSets)),
     };
     const shanghaiDateKey = date => new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(date);
-    const todayDateKey = shanghaiDateKey(new Date());
+    let todayDateKey = shanghaiDateKey(new Date());
     let selectedEdition = null;
     async function fetchEdition(dateKey) {
       try {
@@ -1579,6 +1579,16 @@ html>body{padding:0}</style>
         const edition = await response.json();
         return edition.date === dateKey && Array.isArray(edition.news) && Array.isArray(edition.knowledge) ? edition : null;
       } catch { return null; }
+    }
+    async function fetchLatestNearbyEdition(baseDateKey) {
+      const base = new Date(`${baseDateKey}T00:00:00+08:00`);
+      const offsets = [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6,-7,7];
+      for (const offset of offsets) {
+        const date = shanghaiDateKey(new Date(base.getTime() + offset * 86400000));
+        const edition = await fetchEdition(date);
+        if (edition) return edition;
+      }
+      return null;
     }
     function safeText(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
     function makeText(tag, className, value) {
@@ -1640,8 +1650,8 @@ html>body{padding:0}</style>
         const notice=makeText("p","d-section-label",edition ? "这一天的内容还没有存档；已有打卡记录仍会保留。" : "今天的简报还没生成，生成后刷新页面即可阅读。"); notice.dataset.contentEmpty="true"; newsList.append(notice);
       }
     }
-    const firstEdition = await fetchEdition(todayDateKey);
-    renderEdition(firstEdition, false);
+    const firstEdition = await fetchLatestNearbyEdition(todayDateKey);
+    if (firstEdition?.date) todayDateKey = firstEdition.date;
     const dateLabel = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
     document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = dateLabel);
     const listApp = document.getElementById("daily-list-app");
@@ -1650,6 +1660,7 @@ html>body{padding:0}</style>
     try { localSaved = JSON.parse(localStorage.getItem("dailyBriefProgress") || "{}"); } catch {}
     const saved = window.openai?.widgetState?.modelContent || localSaved;
     const progress = { news: new Set(Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
+    renderEdition(firstEdition, false);
     const dailyGoals = { news: 6, knowledge: 2 };
     let currentMode = "news";
     let currentIndex = 0;

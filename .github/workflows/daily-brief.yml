@@ -1,13 +1,6 @@
 name: Generate daily brief
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/daily-brief.yml"
-      - "scripts/generate_daily.py"
-      - "index.html"
-      - "service-worker.js"
   schedule:
     - cron: "30 23 * * *" # 07:30 China Standard Time
   workflow_dispatch:
