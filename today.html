@@ -1362,8 +1362,8 @@ html>body{padding:0}</style>
         <button type="button" data-tab="news" aria-pressed="true">新闻 <span data-count="news">0/6</span></button>
         <button type="button" data-tab="knowledge" aria-pressed="false">知识 <span data-count="knowledge">0/3</span></button>
       </nav>
-      <nav class="d-week-nav" aria-label="本周每日打卡"><button type="button" data-weekday="0" aria-pressed="true" data-state="partial">周一<br>5日</button><button type="button" data-weekday="1" data-state="complete">周二<br>6日</button><button type="button" data-weekday="2" data-state="complete">周三<br>7日</button><button type="button" data-weekday="3" data-state="partial">周四<br>8日</button><button type="button" data-weekday="4" data-state="complete">周五<br>9日</button><button type="button" data-weekday="5" data-state="empty">周六<br>10日</button><button type="button" data-weekday="6" data-state="empty">周日<br>11日</button></nav>
-      <div class="d-streak" aria-live="polite">🔥 连续完成 3 天 · 点选日期可回看或补读</div>
+      <nav class="d-week-nav" aria-label="本周每日打卡"><button type="button" data-weekday="0" data-state="empty">周一<br>—日</button><button type="button" data-weekday="1" data-state="empty">周二<br>—日</button><button type="button" data-weekday="2" data-state="empty">周三<br>—日</button><button type="button" data-weekday="3" data-state="empty">周四<br>—日</button><button type="button" data-weekday="4" data-state="empty">周五<br>—日</button><button type="button" data-weekday="5" data-state="empty">周六<br>—日</button><button type="button" data-weekday="6" data-state="empty">周日<br>—日</button></nav>
+      <div class="d-streak" aria-live="polite">🔥 本周连续完成 0 天 · 可回看或补读</div>
       <div class="d-progress" aria-live="polite">
         <div class="d-progress-label"><span data-progress-name>新闻阅读</span><span data-progress-count>0 / 6</span></div>
         <div class="d-track" role="progressbar" aria-label="新闻阅读进度" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span></span></div>
@@ -1650,10 +1650,9 @@ Total output lines: 180
     let localSaved = {};
     try { localSaved = JSON.parse(localStorage.getItem("dailyBriefProgress") || "{}"); } catch {}
     const saved = window.openai?.widgetState?.modelContent || localSaved;
-    const progress = { news: new Set(Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
+    const progress = { news: new Set(saved?.date === todayDateKey && Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(saved?.date === todayDateKey && Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
     const dailyGoals = { news: 6, knowledge: 3 };
     renderEdition(null, true);
-    updateAllProgress();
     async function loadLatestEdition() {
       try {
         const edition = await fetchLatestNearbyEdition(todayDateKey);
@@ -1688,8 +1687,9 @@ Total output lines: 180
     let detailKnowledgeIndex = 0;
     let activeApp = listApp;
     function persistProgress() {
-      try { localStorage.setItem("dailyBriefProgress", JSON.stringify({news:[...progress.news],knowledge:[...progress.knowledge],weekReads})); } catch {}
-      const pending = window.openai?.setWidgetState?.({modelContent:{news:[...progress.news],knowledge:[...progress.knowledge],weekReads}});
+      const activeDate = weekButtons[selectedDay].dataset.date;
+      try { localStorage.setItem("dailyBriefProgress", JSON.stringify({date:activeDate,weekKey,news:[...progress.news],knowledge:[...progress.knowledge],weekReads})); } catch {}
+      const pending = window.openai?.setWidgetState?.({modelContent:{date:activeDate,weekKey,news:[...progress.news],knowledge:[...progress.knowledge],weekReads}});
       pending?.catch?.(()=>{});
     }
     function updateProgress(app, mode) {
@@ -1803,12 +1803,12 @@ Total output lines: 180
       updateProgress(listApp, currentMode);
     }));
     const weekButtons = [...listApp.querySelectorAll("[data-weekday]")];
-    const weekReads = Object.fromEntries(weekButtons.map(button => { const savedDay=saved?.weekReads?.[button.dataset.weekday]; return [button.dataset.weekday, {news:Array.isArray(savedDay?.news)?savedDay.news:[], knowledge:Array.isArray(savedDay?.knowledge)?savedDay.knowledge:[]}]; }));
     const dayNames = ["周一","周二","周三","周四","周五","周六","周日"];
     const [todayYear,todayMonth,todayDay] = todayDateKey.split("-").map(Number);
     const todayAtMidnight = new Date(Date.UTC(todayYear,todayMonth-1,todayDay));
     const todayWeekday = (todayAtMidnight.getUTCDay()+6)%7;
     const mondayAtMidnight = new Date(todayAtMidnight.getTime()-todayWeekday*86400000);
+    const weekKey = shanghaiDateKey(mondayAtMidnight);
     const dayLabels = weekButtons.map((button,index) => {
       const date = new Date(mondayAtMidnight.getTime()+index*86400000);
       const key = shanghaiDateKey(date);
@@ -1817,15 +1817,20 @@ Total output lines: 180
       button.disabled=key>todayDateKey;
       return key===todayDateKey ? `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日 · 今天` : `${Number(key.slice(5,7))}月${Number(key.slice(-2))}日`;
     });
+    const weekReads = Object.fromEntries(weekButtons.map(button => {
+      const savedDay = saved?.weekKey === weekKey ? saved.weekReads?.[button.dataset.date] : null;
+      return [button.dataset.date, {news:Array.isArray(savedDay?.news)?savedDay.news:[], knowledge:Array.isArray(savedDay?.knowledge)?savedDay.knowledge:[]}];
+    }));
+    progress.news = new Set(weekReads[todayDateKey].news);
+    progress.knowledge = new Set(weekReads[todayDateKey].knowledge);
     let selectedDay = todayWeekday;
     listApp.querySelectorAll("[data-weekday]").forEach(button => button.setAttribute("aria-pressed", String(Number(button.dataset.weekday) === todayWeekday)));
-    if (!weekReads[selectedDay].news.length) weekReads[selectedDay].news = [...progress.news];
-    if (!weekReads[selectedDay].knowledge.length) weekReads[selectedDay].knowledge = [...progress.knowledge];
     function updateWeekStatus() {
       const goalDone = day => weekReads[day].news.length >= dailyGoals.news && weekReads[day].knowledge.length >= dailyGoals.knowledge;
       weekButtons.forEach(button => {
         const day = button.dataset.weekday;
-        const done = goalDone(day), hasRead = weekReads[day].news.length + weekReads[day].knowledge.length > 0;
+        const dayReads = weekReads[button.dataset.date];
+        const done = goalDone(day), hasRead = dayReads.news.length + dayReads.knowledge.length > 0;
         button.dataset.state = done ? "complete" : hasRead ? "partial" : "empty";
         button.setAttribute("aria-pressed", String(Number(day) === selectedDay));
       });
@@ -1862,8 +1867,9 @@ Total output lines: 180
     }
     weekButtons.forEach(button => button.addEventListener("click", async () => {
       selectedDay = Number(button.dataset.weekday);
-      progress.news = new Set(weekReads[selectedDay].news);
-      progress.knowledge = new Set(weekReads[selectedDay].knowledge);
+      const selectedDateKey = button.dataset.date;
+      progress.news = new Set(weekReads[selectedDateKey].news);
+      progress.knowledge = new Set(weekReads[selectedDateKey].knowledge);
       const edition = await fetchEdition(button.dataset.date);
       renderEdition(edition, false);
       listApp.querySelectorAll("[data-weekday]").forEach(day => day.setAttribute("aria-pressed", String(day === button)));
@@ -1906,8 +1912,8 @@ Total output lines: 180
       listApp.querySelector('[data-tab="knowledge"]').click();
     }
     listApp.querySelector("[data-weekly-back]").addEventListener("click", () => returnToList(closeWeeklySummary));
-    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[selectedDay].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); closeDetail(); });
-    listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[selectedDay].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); closeKnowledge(); });
+    listApp.querySelector(".d-detail .d-finish").addEventListener("click", () => { progress.news.add(detailIndex); weekReads[weekButtons[selectedDay].dataset.date].news=[...progress.news]; persistProgress(); updateProgress(listApp,"news"); updateWeekStatus(); closeDetail(); });
+    listApp.querySelector(".d-knowledge-full .d-finish").addEventListener("click", () => { progress.knowledge.add(detailKnowledgeIndex); weekReads[weekButtons[selectedDay].dataset.date].knowledge=[...progress.knowledge]; persistProgress(); updateProgress(listApp,"knowledge"); renderKnowledgeState(); updateWeekStatus(); closeKnowledge(); });
     updateProgress(listApp,"news");
     renderKnowledgeState();
     updateWeekStatus();
