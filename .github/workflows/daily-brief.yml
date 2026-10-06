@@ -24,8 +24,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Generate today's edition with DeepSeek
+      - name: Generate today's edition (Gemini first, DeepSeek fallback)
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TZ: Asia/Shanghai
         run: python scripts/generate_daily.py
