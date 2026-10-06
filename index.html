@@ -1565,6 +1565,7 @@ Total output lines: 180
     const initialDateLabel = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
     document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = initialDateLabel);
     let selectedEdition = null;
+    const editionCache = new Map([[todayDateKey, {date:todayDateKey,...fallbackEdition,_isFallback:true}]]);
     async function fetchEdition(dateKey) {
       try {
         const response = await fetch(`./content/${dateKey}.json?v=${Date.now()}`, {cache:"no-store"});
@@ -1666,6 +1667,7 @@ Total output lines: 180
           return;
         }
         todayDateKey = edition.date;
+        editionCache.set(todayDateKey, edition);
         const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
         document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
         renderEdition(edition, false);
@@ -1870,8 +1872,14 @@ Total output lines: 180
       const selectedDateKey = button.dataset.date;
       progress.news = new Set(weekReads[selectedDateKey].news);
       progress.knowledge = new Set(weekReads[selectedDateKey].knowledge);
-      const edition = await fetchEdition(button.dataset.date);
-      renderEdition(edition, false);
+      let edition = editionCache.get(selectedDateKey);
+      if (!edition) {
+        edition = await fetchEdition(selectedDateKey);
+        if (edition) editionCache.set(selectedDateKey, edition);
+      }
+      const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${selectedDateKey}T12:00:00+08:00`));
+      document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
+      renderEdition(edition, Boolean(edition?._isFallback));
       listApp.querySelectorAll("[data-weekday]").forEach(day => day.setAttribute("aria-pressed", String(day === button)));
       updateProgress(listApp, currentMode);
       renderKnowledgeState();
