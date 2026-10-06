@@ -187,9 +187,9 @@ def call_model(today: dt.date, sources: list[dict], theme: str, theme_descriptio
 
 新闻每篇的body写成4到7个自然段：短读约1000至1500个汉字，长读约1700至2300个汉字。仅在来源材料支持范围内扩展背景；对不确定或来源未给出的内容明确说明“现有材料未说明”，绝不虚构。每条news字段：category,length,title,excerpt,question,body(字符串数组),answer,tension,quiz,options(正好4个不同且有迷惑性的选项),correct(0至3整数),explanation(清楚详细),sourceIds(至少1个主要可靠媒体；若来源不是人民网或新华网，则至少2个独立出版机构)。选项不能靠明显错误选项凑数，错误项应代表常见但可辨析的误读。参考回答与解释不要重复正文。
 
-每天给4条知识：至少3条围绕本周一个具体且较小的学习主题，并从社会学、心理学、人类学、新闻传播/广播电视、大学生生活等适合领域中选；另有1条舒适圈外学科知识，可轮换法律、医学、经济、地理、历史、统计等，用寓言或生活例子简单引入。知识不是新闻，不得假装当天发生；学习内容需解释概念、来源/形成、如何检验或使用、现实例子。每条knowledge字段：category,title,intro,body(3至5段),practice,questions(1至3题，按内容复杂度决定；每题有prompt,options(正好4项),correct(0至3),explanation)。
+每天给至少3条知识，理想为4条或以上：至少2条围绕本周一个具体且较小的学习主题，并来自用户感兴趣的社会学、心理学、人类学、政治学、新闻传播/广播电视或大学生与初入社会生活知识；至少另有1条舒适圈外学科知识，可轮换法律、医学、经济、地理、历史、统计等，用寓言或生活例子简单引入。知识不是新闻，不得假装当天发生；学习内容需解释概念、来源/形成、如何检验或使用、现实例子。每条knowledge字段：category,title,intro,body(3至5段),practice,questions(1至3题，按内容复杂度决定；每题有prompt,options(正好4项),correct(0至3),explanation)。
 
-返回有效JSON对象，不要Markdown。顶层字段：weeklyTheme{title,description},news(5至12条，优先给足8条以上候选，不够时不要编造),knowledge(正好4条),weeklyRecap{title,body}。如果本周主题已有值，沿用并递进，不要每天换主题；周一选择一个具体、足够一周学清的小切口。本周周六或周日另写weeklyRecap，把本周提供的新闻和知识连成一段总结；其他日可为空对象。严格执行字段类型。"""
+返回有效JSON对象，不要Markdown。顶层字段：weeklyTheme{title,description},news(至少6条，理想10条或以上，最多12条；不够时不要编造),knowledge(至少3条，理想4条或以上，最多5条；其中至少2条category属于用户兴趣/大学生生活范围，至少1条category明确标为“舒适圈外”),weeklyRecap{title,body}。如果本周主题已有值，沿用并递进，不要每天换主题；周一选择一个具体、足够一周学清的小切口。本周周六或周日另写weeklyRecap，把本周提供的新闻和知识连成一段总结；其他日可为空对象。严格执行字段类型。"""
 
     user_payload = {
         "today": today.isoformat(),
@@ -226,20 +226,36 @@ def call_model(today: dt.date, sources: list[dict], theme: str, theme_descriptio
         raise RuntimeError(f"DeepSeek request failed ({type(exc).__name__}); previous edition was preserved.") from None
     try:
         content = result["choices"][0]["message"]["content"]
-        return json.loads(content)
+        finish_reason = result["choices"][0].get("finish_reason", "unknown")
+        if not isinstance(content, str):
+            raise RuntimeError(f"DeepSeek returned non-text JSON content (finish_reason={finish_reason}); previous edition was preserved.")
+        cleaned = content.strip()
+        if cleaned.startswith("```json"):
+            cleaned = cleaned[7:].strip()
+        elif cleaned.startswith("```"):
+            cleaned = cleaned[3:].strip()
+        if cleaned.endswith("```"):
+            cleaned = cleaned[:-3].strip()
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"DeepSeek JSON was incomplete or malformed (finish_reason={finish_reason}, chars={len(content)}, error_at={exc.pos}); previous edition was preserved.") from None
+    except RuntimeError:
+        raise
     except Exception:
-        raise RuntimeError("DeepSeek did not return valid JSON; previous edition was preserved.") from None
+        raise RuntimeError("DeepSeek response was missing its JSON message; previous edition was preserved.") from None
 
 
 def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> dict:
     allowed = {item["id"]: item for item in sources}
     news = raw.get("news")
     knowledge = raw.get("knowledge")
-    if not isinstance(news, list) or not 5 <= len(news) <= 12:
+    if not isinstance(news, list) or not 6 <= len(news) <= 12:
         count = len(news) if isinstance(news, list) else "not a list"
-        raise RuntimeError(f"Generated news count is outside 5–12 (received {count}); previous edition was preserved.")
-    if not isinstance(knowledge, list) or len(knowledge) != 4:
-        raise RuntimeError("Generated knowledge count must be 4; previous edition was preserved.")
+        raise RuntimeError(f"Generated news count is outside 6–12 (received {count}); previous edition was preserved.")
+    if not isinstance(knowledge, list) or not 3 <= len(knowledge) <= 5:
+        count = len(knowledge) if isinstance(knowledge, list) else "not a list"
+        raise RuntimeError(f"Generated knowledge count is outside 3–5 (received {count}); previous edition was preserved.")
 
     normalized_news: list[dict] = []
     for item in news:
@@ -269,8 +285,8 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> di
             "explanation": str(item["explanation"])[:3000],
             "sources": [{"name": ref["feed"], "url": ref["url"]} for ref in refs[:4]],
         })
-    if len(normalized_news) < 5:
-        raise RuntimeError(f"Only {len(normalized_news)} stories passed source checks; at least 5 are required and the previous edition was preserved.")
+    if len(normalized_news) < 6:
+        raise RuntimeError(f"Only {len(normalized_news)} stories passed source checks; at least 6 are required and the previous edition was preserved.")
 
     normalized_knowledge: list[dict] = []
     for item in knowledge:
@@ -300,8 +316,13 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> di
             "practice": str(item.get("practice", ""))[:1000],
             "questions": good_questions,
         })
-    if len(normalized_knowledge) != 4:
-        raise RuntimeError("Knowledge validation failed; previous edition was preserved.")
+    if len(normalized_knowledge) < 3:
+        raise RuntimeError(f"Only {len(normalized_knowledge)} knowledge cards passed checks; at least 3 are required and the previous edition was preserved.")
+    core_fields = ("社会学", "心理学", "人类学", "政治学", "新闻", "广播电视", "大学生", "生活")
+    core_count = sum(any(field in item["category"] for field in core_fields) for item in normalized_knowledge)
+    outside_count = sum("舒适圈外" in item["category"] for item in normalized_knowledge)
+    if core_count < 2 or outside_count < 1:
+        raise RuntimeError(f"Knowledge mix failed (core={core_count}, outside={outside_count}); need at least 2 core and 1 outside-discipline cards.")
 
     theme = raw.get("weeklyTheme") if isinstance(raw.get("weeklyTheme"), dict) else {}
     recap = raw.get("weeklyRecap") if isinstance(raw.get("weeklyRecap"), dict) else {}
@@ -334,7 +355,7 @@ def main() -> None:
     temporary = destination.with_suffix(".json.tmp")
     temporary.write_text(json.dumps(edition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(destination)
-    print(f"Wrote {destination.relative_to(ROOT)} ({len(edition['news'])} stories, 4 learning cards).")
+    print(f"Wrote {destination.relative_to(ROOT)} ({len(edition['news'])} stories, {len(edition['knowledge'])} learning cards).")
 
 
 if __name__ == "__main__":
