@@ -194,6 +194,7 @@ def read_week_archive(monday: dt.date, today: dt.date) -> list[dict]:
                 archive.append({
                     "date": date.isoformat(),
                     "theme": edition.get("weeklyTheme", {}).get("title", ""),
+                    "dailyFocus": edition.get("dailyFocus", {}).get("title", ""),
                     "news": [item.get("title", "") for item in edition.get("news", [])],
                     "knowledge": [item.get("title", "") for item in edition.get("knowledge", [])],
                 })
@@ -213,7 +214,8 @@ def call_model(today: dt.date, sources: list[dict], theme: str, theme_descriptio
 
 每天返回4条知识：至少2条围绕本周一个具体且较小的学习主题，并来自用户感兴趣的社会学、心理学、人类学、政治学、新闻传播/广播电视或大学生与初入社会生活知识；另有1条舒适圈外学科知识，可轮换法律、医学、经济、地理、历史、统计等，用寓言或生活例子简单引入。知识不是新闻，不得假装当天发生；解释概念、来源/形成、如何检验或使用、现实例子。每条body 3段、至少450字；问题解释至少100字。每条knowledge字段：category,title,intro,body(字符串数组),practice,questions(1至2题，按内容复杂度决定；每题有prompt,options(正好4项),correct(0至3),explanation)。
 
-返回有效JSON对象，不要Markdown。顶层字段：weeklyTheme{title,description},news(至少6条，目标10条，最多12条；不够时不要编造),knowledge(至少3条，目标4条，最多4条；其中至少2条category属于用户兴趣/大学生生活范围，至少1条category明确标为“舒适圈外”),weeklyRecap{title,body}。如果本周主题已有值，沿用并递进，不要每天换主题；周一选择一个具体、足够一周学清的小切口。本周周六或周日另写weeklyRecap，把本周提供的新闻和知识连成一段总结；其他日可为空对象。严格执行字段类型。"""
+返回有效JSON对象，不要Markdown。顶层字段：weeklyTheme{title,description},dailyFocus{title,description},news(至少6条，目标10条，最多12条；不够时不要编造),knowledge(至少3条，目标4条，最多4条；其中至少2条category属于用户兴趣/大学生生活范围，至少1条category明确标为“舒适圈外”),weeklyRecap{title,body}。
+weeklyTheme是整周稳定的大主题/总问题，周一确定后周二至周日必须原样沿用，不得改名、换方向或把每日知识主题当成本周主题。dailyFocus是当天的小切口，必须是weeklyTheme的子问题；每天可以变化，但要让本周知识逐步回答同一个总问题。知识至少两条与本周主线及今日切口相关，舒适圈外知识也尽量说明它如何帮助理解主线。周末weeklyRecap必须明确回到weeklyTheme，串联本周已经出现的dailyFocus和知识，不得只罗列每天标题。周一选择一个足够具体、能在一周内讲清楚的大主题，并给当天第一个子问题。严格执行字段类型。"""
 
     user_payload = {
         "today": today.isoformat(),
@@ -270,7 +272,7 @@ def call_model(today: dt.date, sources: list[dict], theme: str, theme_descriptio
         raise RuntimeError("DeepSeek response was missing its JSON message; previous edition was preserved.") from None
 
 
-def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> dict:
+def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date, stable_theme: str = "", stable_theme_description: str = "") -> dict:
     allowed = {item["id"]: item for item in sources}
     news = raw.get("news")
     knowledge = raw.get("knowledge")
@@ -372,13 +374,18 @@ def validate_and_normalize(raw: dict, sources: list[dict], today: dt.date) -> di
         raise RuntimeError(f"Knowledge mix failed (core={core_count}, outside={outside_count}); need at least 2 core and 1 outside-discipline cards.")
 
     theme = raw.get("weeklyTheme") if isinstance(raw.get("weeklyTheme"), dict) else {}
+    daily_focus = raw.get("dailyFocus") if isinstance(raw.get("dailyFocus"), dict) else {}
     recap = raw.get("weeklyRecap") if isinstance(raw.get("weeklyRecap"), dict) else {}
     edition = {
         "date": today.isoformat(),
         "generatedAt": dt.datetime.now(TZ).isoformat(timespec="minutes"),
         "weeklyTheme": {
-            "title": str(theme.get("title", "本周学习主题"))[:160],
-            "description": str(theme.get("description", ""))[:500],
+            "title": str(stable_theme or theme.get("title", "本周学习主题"))[:160],
+            "description": str(stable_theme_description or theme.get("description", ""))[:500],
+        },
+        "dailyFocus": {
+            "title": str(daily_focus.get("title", "今日切口"))[:160],
+            "description": str(daily_focus.get("description", ""))[:500],
         },
         "news": normalized_news,
         "knowledge": normalized_knowledge,
@@ -396,7 +403,7 @@ def main() -> None:
     sources = gather_sources()
     print(f"Collected {len(sources)} recent RSS entries from primary outlets.")
     raw = call_model(today, sources, theme, description, archive)
-    edition = validate_and_normalize(raw, sources, today)
+    edition = validate_and_normalize(raw, sources, today, theme, description)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)
     destination = CONTENT_DIR / f"{today.isoformat()}.json"
     temporary = destination.with_suffix(".json.tmp")
