@@ -1661,7 +1661,7 @@ html>body{padding:0}</style>
     const saved = window.openai?.widgetState?.modelContent || localSaved;
     const progress = { news: new Set(Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
     renderEdition(firstEdition, false);
-    const dailyGoals = { news: 6, knowledge: 2 };
+    const dailyGoals = { news: 6, knowledge: 3 };
     let currentMode = "news";
     let currentIndex = 0;
     let detailIndex = 0;
@@ -1785,8 +1785,9 @@ html>body{padding:0}</style>
     const weekButtons = [...listApp.querySelectorAll("[data-weekday]")];
     const weekReads = Object.fromEntries(weekButtons.map(button => { const savedDay=saved?.weekReads?.[button.dataset.weekday]; return [button.dataset.weekday, {news:Array.isArray(savedDay?.news)?savedDay.news:[], knowledge:Array.isArray(savedDay?.knowledge)?savedDay.knowledge:[]}]; }));
     const dayNames = ["周一","周二","周三","周四","周五","周六","周日"];
-    const todayWeekday = (new Date(`${todayDateKey}T00:00:00+08:00`).getUTCDay()+6)%7;
-    const todayAtMidnight = new Date(`${todayDateKey}T00:00:00+08:00`);
+    const [todayYear,todayMonth,todayDay] = todayDateKey.split("-").map(Number);
+    const todayAtMidnight = new Date(Date.UTC(todayYear,todayMonth-1,todayDay));
+    const todayWeekday = (todayAtMidnight.getUTCDay()+6)%7;
     const mondayAtMidnight = new Date(todayAtMidnight.getTime()-todayWeekday*86400000);
     const dayLabels = weekButtons.map((button,index) => {
       const date = new Date(mondayAtMidnight.getTime()+index*86400000);
