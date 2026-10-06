@@ -1341,6 +1341,9 @@ html>body{padding:0}</style>
         #daily-list-app .d-week-theme { background:var(--d-soft); border-radius:16px; padding:15px; margin:4px 4px 14px; }
         #daily-list-app .d-week-theme strong { display:block; font-size:15px; font-weight:500; margin-bottom:4px; }
         #daily-list-app .d-week-theme p { color:var(--d-sub); font-size:13px; margin:0; }
+        #daily-list-app .d-day-focus { background:var(--d-surface); border:1px solid var(--d-line); border-radius:14px; padding:13px 15px; margin:0 4px 14px; }
+        #daily-list-app .d-day-focus strong { display:block; font-size:14px; font-weight:600; margin-bottom:4px; }
+        #daily-list-app .d-day-focus p { color:var(--d-sub); font-size:13px; margin:0; }
         #daily-list-app .d-knowledge-full .d-quiz { margin-top:23px; }
         #daily-list-app .d-knowledge-full .d-quiz-group { margin:17px 0; }
         #daily-list-app .d-knowledge-full .d-quiz-group h4 { font-size:14px; font-weight:500; line-height:1.55; margin:0 0 8px; }
@@ -1357,7 +1360,7 @@ html>body{padding:0}</style>
       </header>
       <nav class="d-tabs" aria-label="内容类别">
         <button type="button" data-tab="news" aria-pressed="true">新闻 <span data-count="news">0/6</span></button>
-        <button type="button" data-tab="knowledge" aria-pressed="false">知识 <span data-count="knowledge">0/2</span></button>
+        <button type="button" data-tab="knowledge" aria-pressed="false">知识 <span data-count="knowledge">0/3</span></button>
       </nav>
       <nav class="d-week-nav" aria-label="本周每日打卡"><button type="button" data-weekday="0" aria-pressed="true" data-state="partial">周一<br>5日</button><button type="button" data-weekday="1" data-state="complete">周二<br>6日</button><button type="button" data-weekday="2" data-state="complete">周三<br>7日</button><button type="button" data-weekday="3" data-state="partial">周四<br>8日</button><button type="button" data-weekday="4" data-state="complete">周五<br>9日</button><button type="button" data-weekday="5" data-state="empty">周六<br>10日</button><button type="button" data-weekday="6" data-state="empty">周日<br>11日</button></nav>
       <div class="d-streak" aria-live="polite">🔥 连续完成 3 天 · 点选日期可回看或补读</div>
@@ -1367,7 +1370,7 @@ html>body{padding:0}</style>
       </div>
       <div class="d-list-view">
         <main class="d-list" data-list="news">
-          <div class="d-section-label" data-week-title>10月5日 · 今天 · 今日候选 10 条 · 目标任选 6 条读完并完成思考题</div>
+          <div class="d-section-label" data-week-title>正在读取今日简报… · 今日候选 10 条 · 目标任选 6 条读完并完成思考题</div>
           <button class="d-item" type="button" data-story="0"><div class="d-item-top"><span>国内 · 公共服务</span><span class="d-length">长读 · 8分钟</span></div><h2>国庆客流创新高，公共服务能否跟上？</h2><p class="d-excerpt">跨区域出行、假日消费持续升温，也让交通、充电和县域接待能力面临压力。</p><div class="d-read" data-read-label="0">阅读全文 ›</div></button>
           <button class="d-item" type="button" data-story="1"><div class="d-item-top"><span>中文互联网 · 消费</span><span class="d-length">短读 · 5分钟</span></div><h2>“景区冤种三件套”为什么又成了话题？</h2><p class="d-excerpt">文创雪糕、冰箱贴和限定护手霜的同质化，让“地方特色”与场景溢价受到质疑。</p><div class="d-read" data-read-label="1">阅读全文 ›</div></button>
           <button class="d-item" type="button" data-story="2"><div class="d-item-top"><span>国内政策 · 婚姻登记</span><span class="d-length">短读 · 5分钟</span></div><h2>婚姻登记全国通办后，景区也成了服务场景</h2><p class="d-excerpt">各地把登记服务与旅行体验结合，便利、地方文旅和公共服务边界由此交织。</p><div class="d-read" data-read-label="2">阅读全文 ›</div></button>
@@ -1380,8 +1383,9 @@ html>body{padding:0}</style>
           <button class="d-item" type="button" data-story="9"><div class="d-item-top"><span>中文互联网 · 网络热梗</span><span class="d-length">长读 · 8分钟</span></div><h2>动画《牛来》从冷门到全网玩梗：一部作品如何被平台接力推热？</h2><p class="d-excerpt">从票房数字、短视频片段到跨平台二创，这个话题经历了怎样的传播接力？</p><div class="d-read" data-read-label="9">阅读全文 ›</div></button>
         </main>
         <main class="d-knowledge" data-list="knowledge">
-          <div class="d-section-label">本周主题 · 我们怎样判断“值不值得”？</div>
-          <div class="d-week-theme"><strong>从纪念品、等待时间到价格信号</strong><p>用一周拆解“价值”如何被情感、投入和市场信息影响。</p></div>
+          <div class="d-section-label">本周主线</div>
+          <div class="d-week-theme"><strong>我们怎样判断“值不值得”？</strong><p>用一周理解价值判断如何受情感、投入和市场信息影响。</p></div>
+          <div class="d-day-focus"><strong>今日切口 · 从纪念品、等待时间到价格信号</strong><p>观察具体情境中的价值判断，怎样连接到本周主线。</p></div>
           <article class="d-knowledge-card"><div class="d-tag">社会学</div><h2>纪念品为什么不只是一个物件？</h2><p>象征价值、地方身份与送礼关系，怎样附着在一块冰箱贴上。</p><button type="button" data-knowledge="0">进入学习 ›</button></article>
           <article class="d-knowledge-card"><div class="d-tag">心理学</div><h2>排队越久，为什么越舍不得离开？</h2><p>沉没成本会让已经付出的时间影响下一步判断，即使它无法追回。</p><button type="button" data-knowledge="1">进入学习 ›</button></article>
           <article class="d-knowledge-card"><div class="d-tag">大学生生活</div><h2>看 offer，除了月薪还要比较什么？</h2><p>把薪资结构、城市、岗位、试用安排与生活成本放进同一张清单。</p><button type="button" data-knowledge="2">进入学习 ›</button></article>
@@ -1434,6 +1438,9 @@ html>body{padding:0}</style>
         #daily-swipe-app .s-progress { padding:8px 19px 15px; }
         #daily-swipe-app .s-progress-label { display:flex; justify-content:space-between; color:var(--s-sub); font-size:12px; margin-bottom:6px; }
         #daily-swipe-app .s-track { height:5px; border-radius:8px; background:var(--s-line); overflow:hidden; }
+Warning: truncated output (original token count: 14964)
+Total output lines: 180
+
         #daily-swipe-app .s-track span { display:block; width:0; height:100%; background:var(--s-blue); border-radius:8px; transition:width .18s ease; }
         #daily-swipe-app .s-stage { padding:3px 15px 14px; touch-action:pan-y; }
         #daily-swipe-app .s-card { min-height:430px; background:var(--s-surface); border-radius:23px; padding:21px 20px 18px; display:flex; flex-direction:column; }
@@ -1516,23 +1523,7 @@ html>body{padding:0}</style>
       {category:"国内 · 假日出行",length:"长读 · 3分钟",title:"国庆前四天跨区域流动预计12.45亿人次，出行结构有哪些变化？",excerpt:"铁路客运量预计同比增长，公路流动量略降；总量之外，出行方式变化更值得观察。",why:"一个总量数字背后，是交通网络、假日安排与区域消费如何共同变化。",question:"总流动量接近持平时，为什么不同交通方式的变化仍值得关注？",body:["北京日报客户端援引交通运输部门数据报道，10月1日至4日，全国跨区域人员流动量预计为12.45亿人次，同比增长0.1%。其中铁路客运量预计8559万人次，同比增长8.5%；公路人员流动量预计114253万人次，同比下降0.5%。","报道同时提示，国庆假期进入返程阶段，北京10月5日至7日高速公路进京方向将出现车流高峰，下午时段较为集中。交通管理部门建议出行者关注实时路况，合理安排路线和时间，城区出行可优先考虑公共交通。"],answer:"总量接近持平，不代表出行体验与资源需求没有变化。铁路上升、公路略降，提示方式结构可能发生变化；还需结合运力、拥堵时段、票价和不同地区数据判断原因，不能仅凭两组增幅就断言长期趋势。",quiz:"下面哪种解读最符合这组假期出行数据所能支持的范围？",options:["总量持平说明交通系统压力与去年完全相同","总量近乎持平但方式分化，值得继续看运力与地区、时段分布","铁路增长证明旅客整体放弃了公路出行","公路下降足以证明自驾需求已经进入长期下行"],correct:1,source:"https://news.bjd.com.cn/2026/10/05/11983964.shtml"},
       {category:"国内 · 文化消费",length:"短读 · 2分钟",title:"国庆档连续四天单日票房过亿，丰富供给能否带动观影？",excerpt:"北京日报报道，2026年国庆档已有多部新片上映，题材覆盖喜剧、悬疑、爱情和动画。",why:"电影档期既是文化消费，也是观察内容供给和观众选择的窗口。",question:"票房增长可以说明观众更喜欢哪些内容吗？还缺少什么证据？",body:["北京日报客户端10月5日报道，2026年国庆档电影市场连续4天单日票房过亿元，超过10部中外影片上映，题材包括喜剧、悬疑、爱情和动画。报道将影片类型丰富、观众选择增加作为这一档期的特点。","档期票房会受到上映数量、排片、票价、节假日时长和影片宣发等因素影响。要了解具体观众偏好，还需要看单片票房、场次与上座率、不同城市表现及观众调查，不能把总票房直接等同于内容质量或全民偏好。"],answer:"总票房是市场规模指标，不是偏好的直接测量。若要比较观众更喜欢什么，需要把影片供给和排片机会考虑进去，再看上座率、观众结构与反馈；数据可以描述选择，却不能单独判断作品的文化价值。",quiz:"若要比较不同题材的观众接受度，哪一组证据更有解释力？",options:["只比较各片累计票房，不考虑放映场次","结合排片、上座率、票价和观众构成，并区分供给与需求","把社交平台讨论量作为所有观众的偏好代表","将节日期间总票房与非节日总票房直接比较"],correct:1,source:"https://news.bjd.com.cn/2026/10/05/11983964.shtml"},
       {category:"生态环境 · 空气质量",length:"长读 · 3分钟",title:"生态环境部发布10月上半月空气质量预报，北京部分时段或有轻度污染",excerpt:"预报称全国大部以优良为主；京津冀中南部在冷空气间歇期可能出现轻度污染。",why:"空气预报把气象条件与污染物变化联系起来，也提醒我们区分预测与实测。",question:"一份空气质量预报，哪些内容是预测，哪些结论要等监测数据验证？",body:["生态环境部9月30日发布10月上半月全国空气质量预报。中国环境监测总站联合中央气象台及多个区域预报中心开展会商，预计全国大部地区空气质量以优良为主，局地可能出现轻度污染；新疆部分城市受沙尘影响，可能出现PM10中度及以上污染。","对京津冀及周边地区，预报认为冷空气影响期间扩散条件较好，区域大部以优良为主；冷空气间歇期中南部可能出现轻度污染。北京市上半月整体预计以优良为主，部分时段可能轻度污染，首要污染物可能为PM2.5。以上属于预报判断，实际情况需结合后续监测发布。"],answer:"预报是基于气象与污染源条件对未来作出的概率性判断，不是已发生的污染事实。应把“预计”“可能”等措辞保留下来，并在对应日期查看实测数据；若预报与实测不一致，也要考虑风向、湿度、局地排放等条件变化。",quiz:"阅读空气质量预报时，哪种说法最严谨？",options:["预报北京整体优良，说明每一天、每个区域都没有健康风险","预报描述未来可能性，实际空气质量要用后续监测核对","出现轻度污染预报就能确认污染来源是本地排放","若预报后来变化，说明原始监测数据必然错误"],correct:1,source:"https://www.mee.gov.cn/ywdt/xwfb/202609/t20260930_1175612.shtml"},
-      {category:"中文互联网 · 网络热梗",length:"长读 · 3分钟",title:"动画《牛来》从冷门到全网玩梗：一部作品如何被平台接力推热？",excerpt:"多家媒体记录了话题从微博票房数字、短视频片段到跨平台二创的传播过程。",why:"它既是互联网热点，也能帮助新媒体工作者拆解话题如何跨圈层扩散。",question:"《牛来》的走红，哪些环节来自用户共创，哪些又受到平台机制与供给方影响？",body:["澎湃新闻报道，国产动画《牛来》于2026年8月上映，首周票房较低。8月中旬，关于其票房数字的讨论在微博出现，之后影片片段和评论在抖音、小红书、B站、豆瓣等平台传播，内容包括吐槽、观影笔记、二创和对幕后制作的讨论。","相关报道梳理了平台间的传播接力：不同社区提供不同类型的内容，微博话题把分散讨论聚合，影院排片也随关注度变化。新京报另报道，“牛来”谐音被延伸为股民玩梗，相关股票的短期讨论与基本面并非一回事。梗的传播事实、平台机制与由此产生的市场行为，需要分别观察。"],answer:"走红不能简单归因于“网友自发”或“平台操控”其中一端。可从时间线识别用户内容如何触发讨论，再比较平台推荐、热搜聚合、媒体报道、影院加场等环节如何放大它；各环节的作用需要相应证据，不能仅凭热度倒推出单一原因。",quiz:"复盘一个跨平台热梗时，哪种方法最能避免把相关性误当成因果？",options:["建立跨平台时间线，并区分用户内容、推荐曝光、媒体报道和供给变化","把热搜登顶时间当作走红的唯一原因","只数二创视频，因为用户创作天然独立于平台机制","根据最后的票房结果，反向推断最初传播者的动机"],correct:0,source:"https://www.thepaper.cn/newsDetail_forward_33824140"}
-    ];
-    const newsExtensions = [
-      ["理解假日客流，不能只看一个总量数字。客流集中在什么时段、流向哪些城市和县域、游客停留多久，都会改变交通和公共服务承压的方式。对目的地来说，热门景区的拥挤是一种压力，分散到更广区域后的接驳、住宿和应急服务则是另一种压力。","报道中的“创新高”描述的是规模，不自动等于服务改善或恶化。更完整的判断还需要对照历史同期、运力变化、排队时长和投诉等指标，并区分短时峰值与整个假期的平均体验。"],
-      ["这个梗之所以容易传播，是因为它把游客熟悉的消费场景压缩成一个带情绪的标签：好像买了这些东西就成了被景区“收割”的人。但梗的传播力不等于每个产品都名不副实，也不等于消费者不愿意为文创付费。","关键要把吐槽拆成可检验的问题：商品是否同质化、价格与品质是否匹配、所谓限定是否真实、地方创作者是否参与。短视频和社交平台上的集中吐槽能提示体验落差，却不能单独代表全部游客的消费态度。"],
-      ["全国通办首先改变的是办理资格与地点的限制，让跨地区生活的人少一次往返。景区登记点则是另一层服务设计：把一项法定公共服务放入更有仪式感的空间。两者有关联，但不能把“能跨地办理”和“去景区登记”混成同一项改革。","评估这类创新可以同时看便利性、服务覆盖和公平性：普通登记点是否仍然好找、预约是否方便、不同预算的人能否平等办理；再看文旅合作有没有额外费用和清晰的自愿选择。体验可以丰富，基本服务不能被包装成消费项目。"],
-      ["讨论扩招，至少要分清“更多人进入大学”和“更多人获得高质量教育”这两个目标。前者可以看招生名额及其地区分布；后者还涉及师资、课程、实习、住宿和就业支持。名额增长如果没有相应教学资源，可能把入学机会扩大，却让培养体验出现新的差距。","还要注意机会链条发生在高考之前：不同地区的学校资源、家庭信息和备考条件，都会影响谁能竞争新增名额。因此，不能仅凭全国总量推断公平，也不能因为公平问题复杂就否认扩招的意义；更好的做法是追踪受益群体与配套投入。"],
-      ["进入第二轮意味着首轮没有形成过半数支持，领先者还需要争取其他候选人的选民以及尚未决定的选民。竞选重点可能随之调整，候选人会重新组合议题、联盟与承诺。因此，首轮排序是一张政治力量的快照，并不是未来政策已经获得明确授权的完整证明。","解读选举报道时，先把官方计票结果、候选人承诺和媒体分析分开。再观察不同地区的差异、联盟变化和第二轮议题如何移动。经济与社会分歧可能交织，但仅凭一轮票数很难断言某个群体为何投票，避免把复杂选择化约成单一标签。"],
-      ["跨部门工作组的价值在于协调：AI同时牵涉研发、公共采购、情报安全、劳动影响和消费者权益，单个部门很难覆盖全部问题。不过，协调本身不是治理成效。还要知道工作组能提出建议还是能制定约束规则，成员如何处理利益冲突，决定是否公开，以及谁负责执行。","“安全”“竞争力”和“公共利益”有时会相互支持，也可能发生张力。例如更强的安全限制可能影响开放研究，快速部署可能带来效率也增加错误决策风险。判断政策不能只看成立机构的新闻标题，而要继续看权限文件、具体规则、监督方式和受影响者的反馈。"]
-    ];
-    const newsReflections = [
-      {answer:"要判断服务是否跟上，不能只拿游客总量与消费额作结论。客流高峰可能只集中在少数时段和节点；应继续看交通接驳、排队时长、充电和应急设施可用率，并观察本地居民是否也被挤占服务。总量告诉我们压力有多大，分布与体验指标才帮助定位压力落在哪里。",tension:"假日消费能带来收入，也会把成本转给交通系统、基层服务者和当地居民。真正的难题是如何在鼓励出行与保护承载能力之间分配资源；不能把拥挤简单说成“繁荣”或“治理失败”。",options:["比较游客总数与消费额的同比增幅，据此判断服务改善程度","结合客流时空分布、等待时间、设施可用率及居民影响，识别具体瓶颈","只看热门景点的拥挤程度，因为县域和交通服务属于游客个人安排","用社交平台投诉数量代表整体体验，并据此推断公共服务质量"],correct:1,explanation:"B最有解释力，因为它同时看规模、分布、服务结果和居民外溢影响。A把消费增长误当作服务质量；C把公共承载责任完全推给个人；D的投诉有提示价值，却受平台使用习惯和发帖意愿影响，不能直接代表总体。"},
-      {answer:"“冤种三件套”是一个有传播力的吐槽框架，但它并不能证明所有景区文创都同质、也不能代表所有游客都拒绝消费。更可靠的判断要把梗背后的体验拆开：商品是否真正独特、价格是否匹配品质、限定说法是否透明、地方创作者是否参与。网络热度提供线索，不等于抽样调查。",tension:"这里的冲突不是“年轻人愿不愿意花钱”，而是消费者愿意为什么付费：单纯地名包装、稀缺感营销，还是具体的地方工艺与体验。另一方面，地方文化商品化可以带来收入，也可能把复杂文化压扁成可复制的符号。",options:["热梗被广泛转发，足以说明多数游客已不再购买景区文创","把网络吐槽视为体验信号，再用商品设计、价格、来源与消费者调查交叉判断","只要商品确实在当地销售，就能证明它体现地方文化并具有合理溢价","同款商品在多地出现，便可断定地方文化商品化必然损害文化"],correct:1,explanation:"B把网络讨论当作值得调查的信号，而不是总体结论，并提出可核验的产品与市场证据。A从热度推总体偏好；C把销售地点等同文化来源；D把同质化风险直接推成必然伤害，忽略了创作者收益、受众参与和具体语境。"},
-      {answer:"要回答服务与文旅体验结合是否改善公共服务，需要同时看两件事：基本登记是否仍然方便、规范、可负担；景区或仪式化场景是否作为自愿的额外选择。若便利只发生在适合拍照的场景，而普通办理更难，或体验附带隐性消费，就可能偏离公共服务的目标。",tension:"政务服务强调平等可及，文旅产品则常以场景、消费和差异化体验为卖点。两者可以协作，但要明确哪些是法定服务、哪些是可选消费，并保障不消费的人不会因此受到区别对待。",options:["新增景区登记点越受欢迎，就越能证明全国通办提高了公共服务公平性","分别评估基本登记的便利与可及性，以及景区体验是否自愿、透明且不设消费门槛","只比较各地领证人数，因为服务质量可以由需求规模间接反映","将政务服务与旅游拆开，任何仪式感设计都会损害公共服务中立"],correct:1,explanation:"B能区分制度便利与场景创新，并检验公共服务底线是否守住。A把受欢迎程度等同公平；C无法识别未能办理者、等待成本或隐性门槛；D则把潜在冲突误当作不可调和，忽略可通过自愿、透明和基本服务保障来设计边界。"},
-      {answer:"扩招是否更公平，至少要分别检验机会数量、机会分配和培养质量。全国名额增加是重要变化，但还要看新增名额流向哪些地区和群体、学生能否实际获得机会，以及高校师资和教学条件是否同步。公平不是只看入口是否扩大，也要看不同学生进入后能否得到有质量的教育。",tension:"扩大机会与保证质量可能同时需要财政、师资和区域资源投入。若只强调总名额，可能掩盖地区差异；若只强调资源有限，也可能忽略扩招对原本缺少机会群体的真实帮助。判断应基于分布和结果，而非先验立场。",options:["把新增招生名额与全国适龄人口相比，比例上升即可证明教育公平改善","追踪新增名额的地区与群体分布、入学可及性及培养条件，并与基线比较","优先看新增名额中重点高校的比例，因为高校层次决定公平程度","只看毕业就业结果，因为入学机会和培养过程最终都会反映在就业上"],correct:1,explanation:"B对应公平的多个环节，并要求比较变化前后的基线。A只看总量；C把公平缩窄为重点高校名额；D把就业当成唯一结果，容易忽略专业、地区经济和劳动力市场等外部因素，也不能及时发现入学与培养中的差距。"},
-      {answer:"首轮结果可以说明候选人的相对支持与竞争格局，却不能直接揭示每位选民的动机，更不等同于对某一整套政策的授权。要理解“需要改变”指向什么，需结合选民调查、地区与群体差异、竞选承诺、联盟变化及第二轮投票后的政策安排。",tension:"选举报道经常把复杂社会分歧压缩成两个阵营。这样便于叙述，却可能把经济处境、治安、社会保障、身份认同等不同诉求误写成单一原因。政治解释应说明证据来源，也要保留不同动机并存的可能。",options:["领先候选人进入决选，说明多数选民已经认可其主要政策主张","首轮结果呈现竞争结构；选民动机和政策授权仍需用更多证据分别判断","比较候选人的全国得票即可解释地区和社会群体为何支持不同路线","第二轮联盟变化可以替代首轮结果，成为分析民意的唯一可靠依据"],correct:1,explanation:"B区分了可观察的选举结果、难以直接观察的投票动机，以及政策授权这三个层次。A把进入决选误当多数认可；C忽视群体与地区差异；D虽重视联盟变化，却把它过度提升为唯一证据，忽略投票结果、调查与实际政策承诺。"},
-      {answer:"成立工作组只是组织安排，不等于已建立有效治理。判断公共利益是否被真正纳入，需看该机构的法定权限、公开决策和利益冲突规则、问责机制，以及普通用户和受影响群体是否拥有持续参与或申诉渠道；还要追踪规则有没有执行、风险由谁承担。",tension:"AI治理同时面对安全、产业竞争、创新和权利保护，目标间可能冲突。跨部门协作能减少政策割裂，但安全与效率的名义也可能让决策更封闭。关键不是猜测机构动机，而是检查制度约束、透明度和可纠错性。",options:["成立跨部门机构并提到公共利益，足以说明各方利益已得到平衡","检视授权范围、透明与问责安排、利益冲突规则及受影响者参与渠道","比较机构成员中技术部门与监管部门人数，以比例推断公共利益权重","优先评估政策能否保持技术领先，因为产业收益最终会惠及所有用户"],correct:1,explanation:"B关注能否把承诺转化为可检查、可问责的制度安排。A把表态当成落实；C用席位比例替代权限与程序；D假设竞争收益自动转化为普遍利益，忽略风险分配、隐私与受影响者救济等问题。"},
+      {category:"中文互联网 · 网络热梗",length:"长读 · 3分钟",title:"动画《牛来》从冷门到全网玩梗：一部作品如何被平台接力推热？",excerpt:"多家媒体记录了话题从微博票房数字、短视频片段到跨平台二创的传播过程。",why:"它既是互联网热点，也能帮助新媒体工作者拆解话题如何跨圈层扩散。",question:"《牛来》的走红，哪些环节来自用户共创，哪些又受到平台机制与供给方影响？",body:["澎湃新闻报道，国产动画《牛来》于2026年8月上映，首周票房较低。8月中旬，关于其票房数字的讨论在微博出现，之后影片片段和评论在抖音、小红书、B站、豆瓣等平台传播，内容包括吐槽、观影笔记、二创和对幕后制作的讨论。","相关报道梳理了平台间的传播接力：不同社区提供不同类型的内容，微博话题把分散讨论聚合，影院排片也随关注度变化。新京报另报道，“牛来”谐音被延伸为股民玩梗，相关股票的短期讨论与基本面并非一回事。梗的传播事实、平台机制与由此产生的市场行为，需要分别观察。"],answer:"走红不能简单归因于“网友自发”或“平台操控”其中一端。可从时间线识别用户内容如何触发讨论，再比较平台推荐、热搜聚合、媒体报道、影院加场等环节如何放大它；各环节的作用需要相应证据，不能仅凭热度倒推出单一原因。",quiz:"复盘一个跨平台热梗时，哪种方法最能避免把相关性误当成因果？",opt…2964 tokens truncated…惠及所有用户"],correct:1,explanation:"B关注能否把承诺转化为可检查、可问责的制度安排。A把表态当成落实；C用席位比例替代权限与程序；D假设竞争收益自动转化为普遍利益，忽略风险分配、隐私与受影响者救济等问题。"},
       {answer:"这组数据说明假期前四天人员跨区域流动总量预计接近去年同期，但交通方式的变化并不相同。要判断变化代表什么，还要考虑铁路运力、出行距离、价格、假期安排和地区差异。总量与分方式数据共同提供线索，却不足以单独证明人们长期改变了出行偏好。",tension:"宏观流动量便于呈现总体规模，却会遮住不同地区和群体的出行体验。铁路增长可能对应运力增加，也可能有其他因素；不能从一组假日数据跳到长期消费或交通转型结论。",options:["总量同比接近持平，说明出行方式结构也没有实质变化","分方式数据呈现差异，但判断原因和趋势还需供给、地区与时间序列证据","铁路客运增长8.5%，证明旅客普遍把公路出行转向铁路","公路流动量略降，说明假日总体出行意愿正在减弱"],correct:1,explanation:"B把数据能说明的“方式变化”与尚待解释的“变化原因和长期趋势”分开。A把总量当结构；C忽略铁路新增运力和不同统计口径；D把公路一项的轻微下降推成整体意愿减弱，而总流动量并未支持这一结论。"},
       {answer:"总票房反映某一档期的总体收入，但它不是观众偏好的纯粹读数。影片数量、排片时段、票价、营销和节日观影习惯都会影响结果。比较题材接受度，需要看影片获得多少放映机会、实际上座情况和观众结构，并把票房表现与内容评价分开。",tension:"市场指标容易被简化成“观众喜欢什么”，但票房也受供给和发行策略影响。总量增长可以提示文化消费活跃，却不能单独说明所有题材都受欢迎，或作品质量整体提高。",options:["总票房突破某一规模，就能证明观众整体更偏好国片","结合排片、上座率、票价和观众构成，才较能区分供给机会与实际需求","影片类型变多说明观众选择更自由，因此票房可以直接代表偏好","社交平台讨论量能补足票房数据，并代表未购票观众的看法"],correct:1,explanation:"B尝试控制放映机会和观众构成等关键因素。A的结论超出总票房所能支持的范围；C把供给多样等同偏好；D的讨论量既有平台用户偏差，也不一定来自真实观影者，需配合抽样调查或评论数据。"},
       {answer:"这是一份面向未来日期的区域预报，核心信息是整体趋势与局地、时段风险。它不能替代具体城市当天的监测值，也不能直接指出污染来源。读者应保留“预计”“可能”等不确定措辞，再对照实际发布的空气质量数据。",tension:"公众需要足够明确的健康信息，但空气质量会随风向、湿度、沙尘和排放变化。预报必须简化复杂模型，传播时若把概率性判断改写成确定事实，就容易造成误解；反过来，只强调不确定性也会让预警失去实用性。",options:["既然全国大部预计优良，就可以把局地污染风险视为不重要","把预报看作条件性判断，按地区和日期阅读，再用监测结果核对","北京有轻度污染可能，说明北京整个上半月都将持续污染","污染预报出现变化，说明不同机构给出的空气数据互相矛盾"],correct:1,explanation:"B兼顾了预报的时空范围和不确定性。A忽略少数地区可能承受的具体风险；C把部分时段的可能性扩大成持续事实；D混淆预测更新与实测冲突，气象条件变化本来就可能让预测调整。"},
@@ -1581,14 +1572,15 @@ html>body{padding:0}</style>
       } catch { return null; }
     }
     async function fetchLatestNearbyEdition(baseDateKey) {
-      const base = new Date(`${baseDateKey}T00:00:00+08:00`);
-      const offsets = [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6,-7,7];
-      for (const offset of offsets) {
-        const date = shanghaiDateKey(new Date(base.getTime() + offset * 86400000));
-        const edition = await fetchEdition(date);
-        if (edition) return edition;
-      }
-      return null;
+      const base = new Date(`${baseDateKey}T12:00:00+08:00`);
+      const keys = [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6,-7,7]
+        .map(offset => shanghaiDateKey(new Date(base.getTime() + offset * 86400000)));
+      const editions = (await Promise.all(keys.map(fetchEdition))).filter(Boolean);
+      return editions.sort((a,b) => {
+        const aPast = a.date <= baseDateKey, bPast = b.date <= baseDateKey;
+        if (aPast !== bPast) return aPast ? -1 : 1;
+        return aPast ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+      })[0] || null;
     }
     function safeText(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
     function makeText(tag, className, value) {
@@ -1634,6 +1626,15 @@ html>body{padding:0}</style>
         themeBox.querySelector("strong").textContent=theme.title || "本周学习主题";
         themeBox.querySelector("p").textContent=theme.description || "";
       }
+      const focusBox = knowledgeList.querySelector(".d-day-focus");
+      const focus = edition?.dailyFocus;
+      if (focusBox && focus) {
+        focusBox.querySelector("strong").textContent=`今日切口 · ${focus.title || "继续推进本周主线"}`;
+        focusBox.querySelector("p").textContent=focus.description || "围绕本周主线，从一个具体问题继续理解。";
+        focusBox.hidden = false;
+      } else if (focusBox) {
+        focusBox.hidden = true;
+      }
       const recap = edition?.weeklyRecap;
       const summary = document.querySelector(".d-weekly-summary");
       if (summary && recap?.body) {
@@ -1650,18 +1651,35 @@ html>body{padding:0}</style>
         const notice=makeText("p","d-section-label",edition ? "这一天的内容还没有存档；已有打卡记录仍会保留。" : "今天的简报还没生成，生成后刷新页面即可阅读。"); notice.dataset.contentEmpty="true"; newsList.append(notice);
       }
     }
-    const firstEdition = await fetchLatestNearbyEdition(todayDateKey);
-    if (firstEdition?.date) todayDateKey = firstEdition.date;
-    const dateLabel = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
-    document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = dateLabel);
     const listApp = document.getElementById("daily-list-app");
     const swipeApp = document.getElementById("daily-swipe-app");
     let localSaved = {};
     try { localSaved = JSON.parse(localStorage.getItem("dailyBriefProgress") || "{}"); } catch {}
     const saved = window.openai?.widgetState?.modelContent || localSaved;
     const progress = { news: new Set(Array.isArray(saved?.news) ? saved.news : []), knowledge: new Set(Array.isArray(saved?.knowledge) ? saved.knowledge : []) };
-    renderEdition(firstEdition, false);
     const dailyGoals = { news: 6, knowledge: 3 };
+    renderEdition(null, true);
+    updateAllProgress();
+    async function loadLatestEdition() {
+      try {
+        const edition = await fetchLatestNearbyEdition(todayDateKey);
+        if (!edition) {
+          const notice = document.querySelector('[data-list="news"] [data-content-empty]');
+          if (notice) notice.textContent = "暂时无法连接今日简报；目前显示的是离线示例。连接网络后可点击刷新获取最新内容。";
+          return;
+        }
+        todayDateKey = edition.date;
+        const label = new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai",weekday:"long",month:"long",day:"numeric"}).format(new Date(`${todayDateKey}T12:00:00+08:00`));
+        document.querySelectorAll("[data-current-date]").forEach(node => node.textContent = label);
+        renderEdition(edition, false);
+        updateAllProgress();
+        if (typeof renderWeek === "function") renderWeek();
+      } catch {
+        const notice = document.querySelector('[data-list="news"] [data-content-empty]');
+        if (notice) notice.textContent = "暂时无法连接今日简报；目前显示的是离线示例。连接网络后可点击刷新获取最新内容。";
+      }
+    }
+    loadLatestEdition();
     let currentMode = "news";
     let currentIndex = 0;
     let detailIndex = 0;
